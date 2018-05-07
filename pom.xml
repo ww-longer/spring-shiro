@@ -23,7 +23,7 @@
         <jackson.version>2.8.8</jackson.version>
         <commons-io.version>2.5</commons-io.version>
         <hibernate-validator.version>5.3.5.Final</hibernate-validator.version>
-        <poi.version>3.16</poi.version>
+        <poi.version>3.17</poi.version>
     </properties>
 
     <dependencies>
@@ -83,6 +83,14 @@
             <version>${log4j2.version}</version>
         </dependency>
         <!-- log4j2 end -->
+        <!-- log4j -->
+        <!-- https://mvnrepository.com/artifact/log4j/log4j -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
         <!-- Spring begin -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -158,8 +166,28 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
-            <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-examples</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml-schemas</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+
         <!-- ehcache和redis必选其一，也可同时使用（需要注意） -->
         <dependency>
             <groupId>net.sf.ehcache</groupId>

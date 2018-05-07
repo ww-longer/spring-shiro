@@ -82,7 +82,7 @@
 
     <!-- 配置切面 -->
     <aop:config expose-proxy="true" proxy-target-class="true">
-    	<aop:pointcut id="allServiceMethod" expression="execution(* com.**.service..*.*(..))" /> 
+    	<aop:pointcut id="allServiceMethod" expression="execution(* com.*.service..*.*(..))" />
     	<!-- <aop:pointcut id="mainServiceMethod" expression="execution (* com.main.service..*.*(..))" />  -->
         <aop:advisor advice-ref="transactionAdvice" pointcut-ref="allServiceMethod"/>
     </aop:config>

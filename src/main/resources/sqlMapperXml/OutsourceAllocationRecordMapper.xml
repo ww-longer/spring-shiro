@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.main.mapper.OutsourceAllocationRecordMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.main.model.OutsourceAllocationRecord">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="cust_id" property="custId" />
+		<result column="tel_number" property="telNumber" />
+		<result column="ious" property="ious" />
+		<result column="total_amount" property="totalAmount" />
+		<result column="next_refund_day" property="nextRefundDay" />
+		<result column="amount_override" property="amountOverride" />
+		<result column="overdue_principal" property="overduePrincipal" />
+		<result column="overdue_accrual" property="overdueAccrual" />
+		<result column="default_interest" property="defaultInterest" />
+		<result column="age_cd" property="ageCd" />
+		<result column="overdue" property="overdue" />
+		<result column="net_lending_platform" property="netLendingPlatform" />
+		<result column="is_sole_proprietorship" property="isSoleProprietorship" />
+		<result column="dca_distribution" property="dcaDistribution" />
+		<result column="the_case_distribution" property="theCaseDistribution" />
+		<result column="turn_over_day" property="turnOverDay" />
+		<result column="product_name" property="productName" />
+		<result column="total_aging" property="totalAging" />
+		<result column="contract_create_date" property="contractCreateDate" />
+		<result column="remarks" property="remarks" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, name, cust_id AS custId, tel_number AS telNumber, ious, total_amount AS totalAmount, next_refund_day AS nextRefundDay, amount_override AS amountOverride, overdue_principal AS overduePrincipal, overdue_accrual AS overdueAccrual, default_interest AS defaultInterest, age_cd AS ageCd, overdue, net_lending_platform AS netLendingPlatform, is_sole_proprietorship AS isSoleProprietorship, dca_distribution AS dcaDistribution, the_case_distribution AS theCaseDistribution, turn_over_day AS turnOverDay, product_name AS productName, total_aging AS totalAging, contract_create_date AS contractCreateDate, remarks
+	</sql>
+	
+	<select id="selectPageInfo" resultType="Map">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM OUTSOURCE_ALLOCATION_RECORD
+		<where>
+			<if test="custId != null and custId != ''">
+				cust_id = #{custId}
+			</if>
+			<if test="ious != null and ious != ''">
+				ious = #{ious}
+			</if>
+		</where>
+	</select>
+	<select id="selectByMaps" resultType="Map">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM OUTSOURCE_ALLOCATION_RECORD
+		<where>
+			<if test="custId != null and custId != ''">
+				cust_id = #{custId}
+			</if>
+			<if test="ious != null and ious != ''">
+				ious = #{ious}
+			</if>
+		</where>
+	</select>
+
+
+
+</mapper>

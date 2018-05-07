@@ -49,5 +49,9 @@ public class SendMsgUtil {
 			System.out.print("发送成功，返回值为：" + result_mt);
 		}
 	}
+
+	public static  void main(String[] args) throws Exception {
+		SendMsgUtil.send("17521210191","这是测试12312312!");
+	}
 	
 }

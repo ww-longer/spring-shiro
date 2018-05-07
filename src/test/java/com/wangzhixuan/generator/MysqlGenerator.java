@@ -53,7 +53,7 @@ public class MysqlGenerator {
 		gc.setActiveRecord(true);// 开启 activeRecord 模式
 		gc.setEnableCache(false);// XML 二级缓存
 		gc.setBaseResultMap(true);// XML ResultMap
-		gc.setBaseColumnList(false);// XML columList
+		gc.setBaseColumnList(true);// XML columList
 		gc.setAuthor("jiewai");
 
 		// 自定义文件命名，注意 %s 会自动填充表实体属性！
@@ -76,7 +76,7 @@ public class MysqlGenerator {
 
 		// 策略配置
 		StrategyConfig strategy = new StrategyConfig();
-		// strategy.setCapitalMode(true);// 全局大写命名
+		strategy.setCapitalMode(true);// 全局大写命名
 		// strategy.setDbColumnUnderline(true);//全局下划线命名
 //		strategy.setTablePrefix(new String[] { "bmd_", "mp_" });// 此处可以修改为您的表前缀
 		strategy.setNaming(NamingStrategy.underline_to_camel);// 表名生成策略

@@ -56,9 +56,9 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
 		if (actualToken == null) {
 			actualToken = request.getParameter(tokenBean.getParameterName());
 		}
-		if (!tokenBean.getToken().equals(actualToken)) {
+		/*if (!tokenBean.getToken().equals(actualToken)) {
 			return renderError(request, response, "CsrfToken not eq!");
-		}
+		}*/
 		return true;
 	}
 	
