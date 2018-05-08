@@ -9,9 +9,7 @@ import com.sys.commons.base.BaseController;
 import com.sys.service.IUserService;
 
 /**
- * @description：用户管理
- * @author：zhixuan.wang
- * @date：2015/10/1 14:51
+ *
  */
 @Controller
 @RequestMapping("/statistics")

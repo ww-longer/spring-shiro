@@ -12,7 +12,7 @@ import com.sys.model.User;
 @Service
 public class TestService {
     @Autowired
-    private UserMapper userMapper;
+    UserMapper userMapper;
 	
     @Cacheable(value = "hour", key = "#id")
 	public User selectById(Serializable id) {
