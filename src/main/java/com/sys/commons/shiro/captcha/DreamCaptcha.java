@@ -14,7 +14,7 @@ import com.sys.commons.utils.StringUtils;
 import com.sys.commons.utils.WebUtils;
 
 /**
- * 如梦验证码
+ * 验证码
  * @author L.cm
  *
  */
