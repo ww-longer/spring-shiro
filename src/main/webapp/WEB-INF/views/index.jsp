@@ -211,7 +211,6 @@
         <div data-options="region:'center'" style="overflow: hidden;">
             <div id="index_tabs" style="overflow: hidden;">
                 <div title="首页" data-options="iconCls:'fi-home',border:false" style="overflow: hidden;">
-                    <script src='https://www.baidu.com'></script>
                     <style>
                         .pro_name a{color: #4183c4;}
                         .osc_git_title{background-color: #d8e5f1;}
@@ -223,7 +222,7 @@
                 </div>
             </div>
         </div>
-        <div data-options="region:'south',border:false" style="height: 30px;line-height:30px; overflow: hidden;text-align: center;background-color: #eee" >Copyright © 2015 power by <a href="#" target="_blank">界外视觉</a></div>
+        <div data-options="region:'south',border:false" style="height: 30px;line-height:30px; overflow: hidden;text-align: center;background-color: #eee" >Copyright © 2018 power by <a href="#" target="_blank">JIEWAISHIJUE</a></div>
     </div>
     <div id="tabsMenu">
         <div data-options="iconCls:'fi-loop'" type="refresh" style="font-size: 12px;">刷新</div>

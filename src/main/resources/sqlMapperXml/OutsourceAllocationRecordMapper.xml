@@ -32,7 +32,13 @@
 	<sql id="Base_Column_List">
 		id, name, cust_id AS custId, tel_number AS telNumber, ious, total_amount AS totalAmount, next_refund_day AS nextRefundDay, amount_override AS amountOverride, overdue_principal AS overduePrincipal, overdue_accrual AS overdueAccrual, default_interest AS defaultInterest, age_cd AS ageCd, overdue, net_lending_platform AS netLendingPlatform, is_sole_proprietorship AS isSoleProprietorship, dca_distribution AS dcaDistribution, the_case_distribution AS theCaseDistribution, turn_over_day AS turnOverDay, product_name AS productName, total_aging AS totalAging, contract_create_date AS contractCreateDate, remarks
 	</sql>
-	
+
+	<!-- 查询所有数据 -->
+	<select id="selectAllList" resultType="Map">
+		SELECT <include refid="Base_Column_List"/> FROM OUTSOURCE_ALLOCATION_RECORD
+	</select>
+
+	<!-- 分页查询 -->
 	<select id="selectPageInfo" resultType="Map">
 		SELECT
 		<include refid="Base_Column_List"/>
@@ -46,6 +52,8 @@
 			</if>
 		</where>
 	</select>
+
+	<!-- 查询满足条件的所有数据 -->
 	<select id="selectByMaps" resultType="Map">
 		SELECT
 		<include refid="Base_Column_List"/>
@@ -60,6 +68,10 @@
 		</where>
 	</select>
 
+	<!-- 删除所有表数据 -->
+	<delete id="cleanAllData">
+		DELETE FROM OUTSOURCE_ALLOCATION_RECORD
+	</delete>
 
 
 </mapper>

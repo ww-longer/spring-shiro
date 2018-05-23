@@ -1,4 +1,4 @@
-package com.wangzhixuan.generator;
+package com.jiewaishijue.generator;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class MysqlGenerator {
 		// 自定义文件命名，注意 %s 会自动填充表实体属性！
 		gc.setMapperName("%sMapper");
 		gc.setXmlName("%sMapper");
-		gc.setServiceName("I%sService");
+		gc.setServiceName("%sService");
 		gc.setServiceImplName("%sServiceImpl");
 		gc.setControllerName("%sController");
 		mpg.setGlobalConfig(gc);

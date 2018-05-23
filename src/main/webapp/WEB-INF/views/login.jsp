@@ -4,9 +4,25 @@
 <!DOCTYPE html>
 <html>
 <head>
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <title>用户登录-专业的java学习平台</title>
 <meta name="keywords"
 	content="java平台,java学习,spring,mybatis,spring-boot,docker">
+=======
+<title>用户登录-技术IT-专业的java学习平台</title>
+<meta name="keywords"
+	content="java职业教育,java线教育平台,java在线学习,spring,mybatis,spring-boot,docker">
+<meta name="description"
+	content="作为中国最权威的java在线教育平台,拥有海量高清java职业课程,涵盖个个组件,根据java在线学习特点,推出java学习知识体系图,java职业学习实战路径图,帮助java学习者从零基础起步,结合java实战案例演练,系统学习,助你快速成为java优秀技术人才！">
+>>>>>>> Stashed changes
+=======
+<title>用户登录-技术IT-专业的java学习平台</title>
+<meta name="keywords"
+	content="java职业教育,java线教育平台,java在线学习,spring,mybatis,spring-boot,docker">
+<meta name="description"
+	content="作为中国最权威的java在线教育平台,拥有海量高清java职业课程,涵盖个个组件,根据java在线学习特点,推出java学习知识体系图,java职业学习实战路径图,帮助java学习者从零基础起步,结合java实战案例演练,系统学习,助你快速成为java优秀技术人才！">
+>>>>>>> Stashed changes
 <meta name="viewport" content="width=device-width">
 <%@ include file="/commons/basejs.jsp"%>
 <link rel="stylesheet" type="text/css"

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.main.mapper.OutsourceAllocationRepaymentMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.main.model.OutsourceAllocationRepayment">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="cust_id" property="custId" />
+		<result column="tel_number" property="telNumber" />
+		<result column="ious" property="ious" />
+		<result column="cur_amount" property="curAmount" />
+		<result column="repayment_date" property="repaymentDate" />
+		<result column="transfer" property="transfer" />
+		<result column="hand_over_agecd" property="handOverAgecd" />
+		<result column="hand_over_amount" property="handOverAmount" />
+		<result column="company" property="company" />
+		<result column="remarks" property="remarks" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, name, cust_id AS custId, tel_number AS telNumber, ious, cur_amount AS curAmount, repayment_date AS repaymentDate, transfer, hand_over_agecd AS handOverAgecd, hand_over_amount AS handOverAmount, company, remarks
+	</sql>
+
+</mapper>

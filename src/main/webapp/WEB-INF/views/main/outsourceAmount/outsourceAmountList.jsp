@@ -19,10 +19,10 @@
                 <td><a href="javascript:void(0)" onclick="outsourceDataGrid()" class="easyui-linkbutton"
                        iconCls="icon-search" style="width:100px;height:32px">查询</a> &nbsp;&nbsp;
                     <a href="javascript:void(0)" onclick="matching()" class="easyui-linkbutton" iconCls="icon-sum"
-                       style="width:100px;height:32px">匹配</a> &nbsp;&nbsp;
-                    <a href="javascript:void(0)" onclick="downloadExcel()" class="easyui-linkbutton"
+                       style="width:100px;height:32px">数据更新</a> &nbsp;&nbsp;
+                    <%--<a href="javascript:void(0)" onclick="downloadExcel()" class="easyui-linkbutton"
                        iconCls="icon-print"
-                       style="width:100px;height:32px">导出匹配</a> &nbsp;&nbsp;
+                       style="width:100px;height:32px">导出匹配</a> &nbsp;&nbsp;--%>
                 </td>
                 <td>
                     <a href="javascript:void(0)" onclick="downloadAllExcel()" class="easyui-linkbutton"
@@ -36,7 +36,7 @@
         </table>
     </div>
     <div data-options="region:'center',fit:true,border:false">
-        <table id="outsourceDataGrid"></table>
+        <table id="outsourceAmountDataGrid"></table>
     </div>
 </div>
 <script type="text/javascript">
@@ -46,17 +46,19 @@
     });
     // 查询
     function outsourceDataGrid() {
-        var url = "${path}/sc/collection/search";
+        var url = "${path}/sc/collection/outsourceBalance/dataGrid";
         var columns = [[
-            {width: '9%', title: '姓名', field: 'name', sortable: true},
-            {width: '15%', title: '身份证', field: 'custId', sortable: true},
+            {width: '6%', title: '姓名', field: 'name', sortable: true},
+            {width: '12%', title: '身份证', field: 'custId', sortable: true},
             {width: '10%', title: '电话', field: 'telNumber', sortable: true},
-            {width: '15%', title: '借据号', field: 'ious', sortable: true},
-            {width: '10%', title: '网络贷款平台', field: 'netLendingPlatform', sortable: true},
-            {width: '10%', title: '委外公司', field: 'dcaDistribution', sortable: true},
-            {width: '10%', title: '案件类型', field: 'theCaseDistribution', sortable: true},
-            {width: '10%', title: '移交日期', field: 'turnOverDay', sortable: true},
-            {width: '10%', title: '产品名称', field: 'productName', sortable: true}
+            {width: '12%', title: '借据号', field: 'ious', sortable: true},
+            {width: '8%', title: '最新催收金额', field: 'nowCollectionAmount', sortable: true},
+            {width: '5%', title: '最新账龄', field: 'nowAgecd', sortable: true},
+            {width: '10%', title: '移交日期', field: 'transfer', sortable: true},
+            {width: '10%', title: '上次催收金额', field: 'lastCollectionAmount', sortable: true},
+            {width: '5%', title: '上次账龄', field: 'lastAgecd', sortable: true},
+            {width: '10%', title: '更新时间', field: 'updateTime', sortable: true},
+            {width: '10%', title: '备注', field: 'remarks', sortable: true}
         ]];
         var params = {
             custId: $("input[name='custIds']").val(),
@@ -85,7 +87,7 @@
     }
 
     function publicDataGrid(url, columns, params) {
-        $('#outsourceDataGrid').datagrid({
+        $('#outsourceAmountDataGrid').datagrid({
             url: url,
             striped: true,
             rownumbers: true,

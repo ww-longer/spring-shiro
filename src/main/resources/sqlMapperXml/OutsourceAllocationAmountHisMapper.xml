@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.main.mapper.OutsourceAllocationAmountHisMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.main.model.OutsourceAllocationAmountHis">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="cust_id" property="custId" />
+		<result column="tel_number" property="telNumber" />
+		<result column="ious" property="ious" />
+		<result column="now_collection_amount" property="nowCollectionAmount" />
+		<result column="now_agecd" property="nowAgecd" />
+		<result column="transfer" property="transfer" />
+		<result column="the_push_day" property="thePushDay" />
+		<result column="last_collection_amount" property="lastCollectionAmount" />
+		<result column="last_agecd" property="lastAgecd" />
+        <result column="update_time" property="updateTime" />
+		<result column="remarks" property="remarks" />
+	</resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, cust_id AS custId, tel_number AS telNumber, ious, now_collection_amount AS nowCollectionAmount, now_agecd AS nowAgecd, transfer, the_push_day AS thePushDay, last_collection_amount AS lastCollectionAmount, last_agecd AS lastAgecd, update_time AS updateTime, remarks
+    </sql>
+
+</mapper>

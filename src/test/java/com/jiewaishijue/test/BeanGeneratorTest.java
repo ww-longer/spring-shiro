@@ -1,4 +1,4 @@
-package com.wangzhixuan.test;
+package com.jiewaishijue.test;
 
 import com.sys.commons.utils.BeanProperty;
 import com.sys.commons.utils.BeanUtils;

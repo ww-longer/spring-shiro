@@ -20,4 +20,8 @@ public interface OutsourceAllocationRecordMapper extends BaseMapper<OutsourceAll
     List<Map<String,Object>> selectPageInfo(Page<Map<String, Object>> page, Map<String, Object> condition);
 
     List<Map<String,Object>> selectByMaps(Map<String, Object> map);
+
+    List<Map<String,Object>> selectAllList();
+
+    void cleanAllData();
 }

@@ -1,4 +1,4 @@
-package com.wangzhixuan.test;
+package com.jiewaishijue.test;
 
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -7,7 +7,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import com.sys.commons.sms.SendMsgUtil;
-import com.wangzhixuan.test.base.BaseTest;
+import com.jiewaishijue.test.base.BaseTest;
 
 /**
  * 首页测试

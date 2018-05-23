@@ -16,9 +16,10 @@ import com.sys.commons.base.BaseController;
 
 import com.sys.commons.result.PageInfo;
 
+import com.sys.commons.utils.ExcelUtils;
+import com.sys.commons.utils.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
-import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -28,6 +29,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.main.model.OutsourceAllocationRecord;
 import com.main.service.IOutsourceAllocationRecordService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -130,29 +132,39 @@ public class OutsourceAllocationRecordController extends BaseController {
 
 
     /**
-     * 添加页面
+     * 下载导出所有数据
      *
      * @return
      */
-    @GetMapping("/addPage")
-    public String addPage() {
-        return "admin/outsourceAllocationRecord/outsourceAllocationRecordAdd";
+    @GetMapping("/downloadAll")
+    public void downloadAll(HttpServletRequest request, HttpServletResponse response) {
+        outsourceAllocationRecordService.downLoadAllDate(request, response);
     }
 
     /**
-     * 添加
+     * 委外中文件导入
      *
      * @param
      * @return
      */
-    @PostMapping("/add")
+    @PostMapping("/uploadInOutsourceExcel")
     @ResponseBody
-    public Object add(@Valid OutsourceAllocationRecord outsourceAllocationRecord) {
-
-        if (true) {
-            return renderSuccess("添加成功！");
-        } else {
-            return renderError("添加失败！");
+    public Object uploadInOutsourceExcel(@RequestParam("file") MultipartFile file){
+        if (!file.isEmpty()) {
+            // 转换为 File
+            File tempFile = null;
+            try {
+                tempFile = FileUtils.multipartToFile(file);
+                // 获取导入文件中的数据
+                List<HashMap<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
+                outsourceAllocationRecordService.importInOutsourceExcel(listMap);
+                return renderSuccess("文件导入成功！");
+            } catch (IOException e) {
+                e.printStackTrace();
+                return renderError("文件读取失败！");
+            }
+        }else{
+            return renderError("文件不存在！");
         }
     }
 
@@ -177,14 +189,11 @@ public class OutsourceAllocationRecordController extends BaseController {
      * 编辑
      *
      * @param model
-     * @param id
      * @return
      */
-    @GetMapping("/editPage")
-    public String editPage(Model model, Long id) {
-        OutsourceAllocationRecord outsourceAllocationRecord = outsourceAllocationRecordService.selectById(id);
-        model.addAttribute("outsourceAllocationRecord", outsourceAllocationRecord);
-        return "admin/outsourceAllocationRecord/outsourceAllocationRecordEdit";
+    @GetMapping("/uploadPage")
+    public String uploadPage(Model model) {
+        return "main/outsourceAllocationRecord/excelUpload";
     }
 
     /**

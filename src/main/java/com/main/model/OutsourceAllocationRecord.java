@@ -99,10 +99,13 @@ public class OutsourceAllocationRecord extends  BaseEntity{
 	@TableField("dca_distribution")
 	private String dcaDistribution;
     /**
-     * 案件分配
+     * 案件类型
      */
 	@TableField("the_case_distribution")
 	private String theCaseDistribution;
+	/**
+	 * 移交日期
+	 */
 	@TableField("turn_over_day")
 	private String turnOverDay;
     /**

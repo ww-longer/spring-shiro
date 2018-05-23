@@ -1,4 +1,4 @@
-package com.wangzhixuan.test.base;
+package com.jiewaishijue.test.base;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
