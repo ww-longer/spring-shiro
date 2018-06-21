@@ -1,21 +1,31 @@
 package com.main.controller;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import com.main.model.OutsourceAllocationAmount;
+import com.main.model.OutsourceAllocationAmountHis;
+import com.main.model.OutsourceCompany;
 import com.main.service.IOutsourceAllocationAmountService;
 import com.main.service.OutsourceAllocationAmountHisService;
+import com.main.service.OutsourceCompanyService;
 import com.sys.commons.base.BaseController;
 import com.sys.commons.result.PageInfo;
+import com.sys.commons.utils.DateUtils;
+import com.sys.commons.utils.ExcelUtils;
+import com.sys.commons.utils.FileUtils;
+import com.sys.commons.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -34,9 +44,16 @@ public class OutsourceAllocationAmountController extends BaseController {
     @Autowired
     private IOutsourceAllocationAmountService outsourceAllocationAmountService;
 
+    @Autowired
+    private OutsourceCompanyService outsourceCompanyService;
+
+    @Autowired
+    private OutsourceAllocationAmountHisService outsourceAllocationAmountHisService;
+
     @GetMapping("/search")
-    public String search() {
-        return "main/outsourceAmount/outsourceAmountList";
+    public String search(Model model) {
+        model.addAttribute("companies", outsourceCompanyService.loadAllCompany());
+        return "sc_main/outsourceAmount/outsourceAmountList";
     }
 
     @PostMapping("/dataGrid")
@@ -48,82 +65,149 @@ public class OutsourceAllocationAmountController extends BaseController {
         // 创建查询参数
         amountMap.put("custId", amount.getCustId());
         amountMap.put("ious", amount.getIous());
+        amountMap.put("company", amount.getCompany());
+        amountMap.put("startTransferTime", amount.getStartTransferTime());
+        amountMap.put("endTransfertTime", amount.getEndTransferTime());
+        amountMap.put("startThePushDayTime", amount.getStartThePushDayTime());
+        amountMap.put("endThePushDayTime", amount.getEndThePushDayTime());
+
         pageInfo.setCondition(amountMap);
         outsourceAllocationAmountService.selectPageInfo(pageInfo);
         return pageInfo;
     }
-    
-    /**
-     * 添加页面
-     * @return
-     */
-    @GetMapping("/addPage")
-    public String addPage1() {
-        return "admin/outsourceAllocationAmount/outsourceAllocationAmountAdd";
-    }
-    
-    /**
-     * 添加
-     * @param 
-     * @return
-     */
-    @PostMapping("/add")
-    @ResponseBody
-    public Object add(@Valid OutsourceAllocationAmount outsourceAllocationAmount) {
 
-        boolean b = outsourceAllocationAmountService.insert(outsourceAllocationAmount);
-        if (b) {
-            return renderSuccess("添加成功！");
-        } else {
-            return renderError("添加失败！");
+    /**
+     * 文件导入页面加载
+     *
+     * @return
+     */
+    @GetMapping("/uploadPage")
+    public String uploadPage() {
+        return "sc_main/outsourceAmount/importAmountDateUpdate";
+    }
+
+
+    /**
+     *  加载更新页面
+     */
+    @GetMapping("/updateAmountPage")
+    public String updateAmountPage(@RequestParam("custId") String custId, String ious, Model model) {
+        Map<String, Object> objectMap = new HashMap<>();
+        objectMap.put("custId", custId);
+        List<OutsourceAllocationAmount> amounts = outsourceAllocationAmountService.loadAmountByMaps(objectMap);
+        if (null != amounts && amounts.size() > 0) {
+            List<OutsourceCompany> companies = outsourceCompanyService.loadAllCompany();
+            model.addAttribute("amount", amounts.get(0));
+            model.addAttribute("companies", companies);
+            model.addAttribute("ious", ious);
+            model.addAttribute("transfer", DateUtils.dateToString(amounts.get(0).getTransfer(), "yyyy-MM-dd HH:mm:ss"));
+            model.addAttribute("thePushDay", DateUtils.dateToString(amounts.get(0).getThePushDay(), "yyyy-MM-dd HH:mm:ss"));
+        }
+        return "sc_main/outsourceAmount/updateAmountPage";
+    }
+
+    /**
+     * 添加页面加载
+     * @return
+     */
+    @GetMapping("/addAmountPage")
+    public String addAmountPage(Model model) {
+        model.addAttribute("companies", outsourceCompanyService.loadAllCompany());
+        return "sc_main/outsourceAmount/addAmountPage";
+    }
+
+    /**
+     * 余额表数据导入更新
+     * @param file
+     * @return
+     */
+    @PostMapping("/outsourceAmountUpdateExcel")
+    @ResponseBody
+    public Object outsourceAmountUpdateExcel(@RequestParam("file") MultipartFile file) {
+        Long startTime = System.currentTimeMillis();
+        if (!file.isEmpty()) {
+            // 转换为 File
+            File tempFile = null;
+            try {
+                tempFile = FileUtils.multipartToFile(file);
+                // 获取导入文件中的数据
+                List<HashMap<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
+                outsourceAllocationAmountService.importInOutsourceAmountExcel(listMap);
+                Long endTime = System.currentTimeMillis();
+                System.out.println("余额文件上传更新总耗时:" + (endTime-startTime));
+                return renderSuccess("数据更新完成！");
+            } catch (IOException e) {
+                e.printStackTrace();
+                return renderError("文件读取失败！");
+            }
+        }else{
+            return renderError("文件不存在！");
         }
     }
-    
-    /**
-     * 删除
-     * @param id
-     * @return
-     */
-    @PostMapping("/delete")
-    @ResponseBody
-    public Object delete(Long id) {
-        OutsourceAllocationAmount outsourceAllocationAmount = new OutsourceAllocationAmount();
 
-        boolean b = outsourceAllocationAmountService.updateById(outsourceAllocationAmount);
-        if (b) {
-            return renderSuccess("删除成功！");
-        } else {
-            return renderError("删除失败！");
-        }
-    }
-    
+
     /**
-     * 编辑
-     * @param model
-     * @param id
+     * 修改退案日期
+     * @param amount
      * @return
      */
-    @GetMapping("/editPage")
-    public String editPage(Model model, Long id) {
-        OutsourceAllocationAmount outsourceAllocationAmount = outsourceAllocationAmountService.selectById(id);
-        model.addAttribute("outsourceAllocationAmount", outsourceAllocationAmount);
-        return "admin/outsourceAllocationAmount/outsourceAllocationAmountEdit";
-    }
-    
-    /**
-     * 编辑
-     * @param 
-     * @return
-     */
-    @PostMapping("/edit")
+    @PostMapping("/updateAmountByCustId")
     @ResponseBody
-    public Object edit(@Valid OutsourceAllocationAmount outsourceAllocationAmount) {
-        //outsourceAllocationAmount.setUpdateTime(new Date());
-        boolean b = outsourceAllocationAmountService.updateById(outsourceAllocationAmount);
-        if (b) {
-            return renderSuccess("编辑成功！");
+    public Object updateAmountByCustId(OutsourceAllocationAmount amount) {
+        if (null == amount.getThePushDay() || "".equals(amount.getThePushDay())) {
+            return renderError("请输入正确的留案时间！");
+        }
+        if (null == amount.getTransfer() || "".equals(amount.getTransfer())) {
+            return renderError("请输入正确的移交时间！");
+        }
+        if (null == amount.getCustId() || "".equals(amount.getCustId())) {
+            return renderError("数据异常,请重新登陆！");
+        }
+        outsourceAllocationAmountService.updateAmountByCustId(amount);
+        return renderSuccess("数据更新完成！");
+    }
+
+    /**
+     * 导出全量余额数据
+     * @param amount
+     * @param request
+     * @param response
+     */
+    @GetMapping("/downloadAllAmountExp")
+    @ResponseBody
+    public void downloadAllAmountExp(OutsourceAllocationAmount amount, HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> amountMap = new HashMap<>();
+        // 创建查询参数
+        amountMap.put("company", amount.getCompany());
+        amountMap.put("startTransferTime", amount.getStartTransferTime());
+        amountMap.put("endTransfertTime", amount.getEndTransferTime());
+        amountMap.put("startThePushDayTime", amount.getStartThePushDayTime());
+        amountMap.put("endThePushDayTime", amount.getEndThePushDayTime());
+
+        outsourceAllocationAmountService.exportInAllAmountByMap(amountMap, request, response);
+    }
+
+    @PostMapping("/addAmount")
+    @ResponseBody
+    public Object addAmount(OutsourceAllocationAmount amount) {
+        // 查询大总表数据
+        if (StringUtils.isBlank(amount.getCustId())) {
+            return renderError("身份证号不可以为空！");
+        }
+        if (StringUtils.isBlank(amount.getIous())) {
+            return renderError("借据号不可以为空！");
+        }
+        if (null == amount.getTransfer()) {
+            return renderError("移交日期不可以为空！");
+        }
+        if (null == amount.getThePushDay()) {
+            return renderError("退催日期不可以为空！");
+        }
+        Map map = outsourceAllocationAmountService.addAmountData(amount);
+        if (map.get("code") == "200") {
+            return renderSuccess("数据添加完成！");
         } else {
-            return renderError("编辑失败！");
+            return renderError(map.get("msg").toString());
         }
     }
 }

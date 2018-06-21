@@ -2,11 +2,10 @@ package com.main.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 import java.io.*;
-import java.net.URLEncoder;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import java.util.List;
@@ -16,16 +15,16 @@ import com.sys.commons.base.BaseController;
 
 import com.sys.commons.result.PageInfo;
 
+import com.sys.commons.utils.DateUtils;
 import com.sys.commons.utils.ExcelUtils;
 import com.sys.commons.utils.FileUtils;
-import org.apache.commons.lang.StringUtils;
 
+import com.sys.commons.utils.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.main.model.OutsourceAllocationRecord;
 import com.main.service.IOutsourceAllocationRecordService;
@@ -48,7 +47,7 @@ public class OutsourceAllocationRecordController extends BaseController {
 
     @GetMapping("/outsource")
     public String manager() {
-        return "main/outsourceAllocationRecord/outsourceAllocationRecordList";
+        return "sc_main/outsourceAllocationRecord/outsourceAllocationRecordList";
     }
 
     @PostMapping("/search")
@@ -78,9 +77,9 @@ public class OutsourceAllocationRecordController extends BaseController {
     }
 
     @PostMapping("/download")
-    public void downloadExcel(OutsourceAllocationRecord record, HttpServletRequest request, HttpServletResponse response) {
+    public void download(OutsourceAllocationRecord record, HttpServletRequest request, HttpServletResponse response) {
         try {
-            if (record == null || record.getCustId() == null || "".equals(record.getCustId())) {
+            if (record == null || StringUtils.isBlank(record.getCustId())) {
                 renderError("请填写要导出的客户身份证号!");
             }
             Map<String, Object> condition = new HashMap<>();
@@ -99,6 +98,12 @@ public class OutsourceAllocationRecordController extends BaseController {
                 row.createCell(3).setCellValue("公司2");
                 row.createCell(4).setCellValue("公司3");
                 row.createCell(5).setCellValue("公司4");
+                row.createCell(6).setCellValue("公司5");
+                row.createCell(7).setCellValue("公司6");
+                row.createCell(8).setCellValue("公司7");
+                row.createCell(9).setCellValue("公司8");
+                row.createCell(10).setCellValue("公司9");
+                row.createCell(11).setCellValue("公司10");
                 for (int i = 0; i < mapList.size(); i++) {
                     row = sheet.createRow(i + 1);
                     Map map = mapList.get(i);
@@ -108,25 +113,20 @@ public class OutsourceAllocationRecordController extends BaseController {
                     row.createCell(3).setCellValue((String) map.get("ww2"));
                     row.createCell(4).setCellValue((String) map.get("ww3"));
                     row.createCell(5).setCellValue((String) map.get("ww4"));
+                    row.createCell(6).setCellValue((String) map.get("ww5"));
+                    row.createCell(7).setCellValue((String) map.get("ww6"));
+                    row.createCell(8).setCellValue((String) map.get("ww7"));
+                    row.createCell(9).setCellValue((String) map.get("ww8"));
+                    row.createCell(10).setCellValue((String) map.get("ww9"));
+                    row.createCell(11).setCellValue((String) map.get("ww10"));
                 }
-                OutputStream fos = null;
-                fos = response.getOutputStream();
-                String userAgent = request.getHeader("USER-AGENT");
-                String fileName = "已委外公司匹配清单";
-                if (StringUtils.contains(userAgent, "Mozilla")) {
-                    fileName = new String(fileName.getBytes(), "ISO8859-1");
-                } else {
-                    fileName = URLEncoder.encode(fileName, "utf8");
-                }
-                response.setCharacterEncoding("UTF-8");
-                response.setContentType("multipart/form-data");
-                response.setHeader("Content-Disposition", "Attachment;Filename=" + fileName + ".xlsx");
-                wb.write(fos);
-                fos.flush();
-                fos.close();
+                String fileName = "已委外公司匹配清单_" + DateUtils.dateToString(new Date(), "yyyyMMdd") + ".xlsx";
+                // 文件下载到浏览器
+                ExcelUtils.writeFileToClient(fileName, wb, request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            renderError("导出文件异常!");
         }
     }
 
@@ -150,6 +150,7 @@ public class OutsourceAllocationRecordController extends BaseController {
     @PostMapping("/uploadInOutsourceExcel")
     @ResponseBody
     public Object uploadInOutsourceExcel(@RequestParam("file") MultipartFile file){
+        Long startTime = System.currentTimeMillis();
         if (!file.isEmpty()) {
             // 转换为 File
             File tempFile = null;
@@ -157,8 +158,14 @@ public class OutsourceAllocationRecordController extends BaseController {
                 tempFile = FileUtils.multipartToFile(file);
                 // 获取导入文件中的数据
                 List<HashMap<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
-                outsourceAllocationRecordService.importInOutsourceExcel(listMap);
-                return renderSuccess("文件导入成功！");
+                Map<String, Object> map = outsourceAllocationRecordService.importInOutsourceExcel(listMap);
+                Long endTime = System.currentTimeMillis();
+                System.out.println("文件上传总耗时:" + (endTime-startTime));
+                if (map.get("code").equals("200")) {
+                    return renderSuccess(map.get("msg"));
+                } else {
+                    return renderError(map.get("msg").toString());
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 return renderError("文件读取失败！");
@@ -169,49 +176,55 @@ public class OutsourceAllocationRecordController extends BaseController {
     }
 
     /**
-     * 删除
-     *
-     * @param id
-     * @return
-     */
-    @PostMapping("/delete")
-    @ResponseBody
-    public Object delete(Long id) {
-
-        if (true) {
-            return renderSuccess("删除成功！");
-        } else {
-            return renderError("删除失败！");
-        }
-    }
-
-    /**
-     * 编辑
-     *
-     * @param model
+     * 文件导入页面加载
      * @return
      */
     @GetMapping("/uploadPage")
-    public String uploadPage(Model model) {
-        return "main/outsourceAllocationRecord/excelUpload";
+    public String uploadPage() {
+        return "sc_main/outsourceAllocationRecord/excelUpload";
+    }
+
+
+    /**
+     * 移交案件添加
+     * @return
+     */
+    @GetMapping("/uploadAmountAndRecordPage")
+    public String uploadAmountAndRecordPage() {
+        return "sc_main/outsourceAllocationRecord/uploadAmountAndRecord";
     }
 
     /**
-     * 编辑
-     *
-     * @param
+     * 导入移交数据
+     * @param file
      * @return
      */
-    @PostMapping("/edit")
+    @PostMapping("/uploadAmountAndRecordExcel")
     @ResponseBody
-    public Object edit(@Valid OutsourceAllocationRecord outsourceAllocationRecord) {
-        boolean b = outsourceAllocationRecordService.updateById(outsourceAllocationRecord);
-        if (b) {
-            return renderSuccess("编辑成功！");
-        } else {
-            return renderError("编辑失败！");
+    public Object uploadAmountAndRecordExcel(@RequestParam("file") MultipartFile file){
+        Long startTime = System.currentTimeMillis();
+        if (!file.isEmpty()) {
+            // 转换为 File
+            File tempFile = null;
+            try {
+                tempFile = FileUtils.multipartToFile(file);
+                // 获取导入文件中的数据
+                List<HashMap<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
+                Map<String, Object> map = outsourceAllocationRecordService.importAmountAndRecordExcel(listMap);
+                Long endTime = System.currentTimeMillis();
+                System.out.println("文件上传总耗时:" + (endTime-startTime));
+                if (map.get("code").equals("200")) {
+                    return renderSuccess(map.get("msg"));
+                } else {
+                    return renderError(map.get("msg").toString());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return renderError("文件读取失败！");
+            }
+        }else{
+            return renderError("文件不存在！");
         }
     }
-
 
 }

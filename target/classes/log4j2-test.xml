@@ -31,7 +31,7 @@
         <!-- 业务debug日志 -->
         <logger name="com.jiewaishijue" level="DEBUG"/>
         
-        <Root level="debug">
+        <Root level="info">
             <AppenderRef ref="Console" />
         </Root>
     </Loggers>

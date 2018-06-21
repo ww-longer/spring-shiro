@@ -2,41 +2,186 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.main.mapper.OutsourceAllocationAmountMapper">
 
-	<!-- 通用查询映射结果 -->
-	<resultMap id="BaseResultMap" type="com.main.model.OutsourceAllocationAmount">
-		<id column="id" property="id" />
-		<result column="name" property="name" />
-		<result column="cust_id" property="custId" />
-		<result column="tel_number" property="telNumber" />
-		<result column="ious" property="ious" />
-		<result column="now_collection_amount" property="nowCollectionAmount" />
-		<result column="now_agecd" property="nowAgecd" />
-		<result column="transfer" property="transfer" />
-		<result column="the_push_day" property="thePushDay" />
-		<result column="last_collection_amount" property="lastCollectionAmount" />
-		<result column="last_agecd" property="lastAgecd" />
-		<result column="update_time" property="updateTime" />
-		<result column="remarks" property="remarks" />
-	</resultMap>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.main.model.OutsourceAllocationAmount">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="cust_id" property="custId"/>
+        <result column="tel_number" property="telNumber"/>
+        <result column="ious" property="ious"/>
+        <result column="now_collection_amount" property="nowCollectionAmount"/>
+        <result column="now_agecd" property="nowAgecd"/>
+        <result column="transfer_agecd" property="transferAgecd"/>
+        <result column="transfer" property="transfer"/>
+        <result column="the_push_day" property="thePushDay"/>
+        <result column="last_collection_amount" property="lastCollectionAmount"/>
+        <result column="last_agecd" property="lastAgecd"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="company" property="company"/>
+        <result column="remarks" property="remarks"/>
+        <result column="creat_date" property="creatDate"/>
+        <result column="is_leave_case" property="isLeaveCase"/>
+        <result column="leave_case_date" property="leaveCaseDate"/>
+    </resultMap>
 
-	<!-- 通用查询结果列 -->
-	<sql id="Base_Column_List">
-		id, name, cust_id AS custId, tel_number AS telNumber, ious, now_collection_amount AS nowCollectionAmount, now_agecd AS nowAgecd, transfer, the_push_day AS thePushDay, last_collection_amount AS lastCollectionAmount, last_agecd AS lastAgecd, update_time AS updateTime, remarks
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+		id, name, cust_id AS custId, tel_number AS telNumber, ious, now_collection_amount AS nowCollectionAmount,
+		now_agecd AS nowAgecd, transfer_agecd AS transferAgecd, transfer, the_push_day AS thePushDay,
+		last_collection_amount AS lastCollectionAmount, last_agecd AS lastAgecd, update_time AS updateTime,
+		company, remarks, creat_date AS creatDate, is_leave_case AS isLeaveCase, leave_case_date AS leaveCaseDate
 	</sql>
 
-	<!-- 分页查询 -->
-	<select id="selectPageInfo" resultType="Map">
-		SELECT
-		<include refid="Base_Column_List"/>
-		FROM OUTSOURCE_ALLOCATION_AMOUNT
-		<where>
-			<if test="custId != null and custId != ''">
-				CUST_ID = #{custId}
-			</if>
-			<if test="ious != null and ious != ''">
-				IOUS = #{ious}
-			</if>
-		</where>
-	</select>
+    <!-- 分页查询 -->
+    <select id="selectPageInfo" resultType="Map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM OUTSOURCE_ALLOCATION_AMOUNT
+        <where>
+            1=1
+            <if test="custId != null and custId != ''">
+                AND CUST_ID = #{custId}
+            </if>
+            <if test="ious != null and ious != ''">
+                AND IOUS = #{ious}
+            </if>
+            <if test="company != null and company != ''">
+                AND COMPANY = #{company}
+            </if>
+            <if test="startTransferTime != null and startTransferTime != ''">
+                AND TRANSFER >= #{startTransferTime}
+            </if>
+            <if test="endTransfertTime != null and endTransfertTime != ''">
+                AND TRANSFER &lt;= #{endTransfertTime}
+            </if>
+            <if test="startThePushDayTime != null and startThePushDayTime != ''">
+                AND THE_PUSH_DAY >= #{startThePushDayTime}
+            </if>
+            <if test="endThePushDayTime != null and endThePushDayTime != ''">
+                AND THE_PUSH_DAY &lt;= #{endThePushDayTime}
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询满足条件的所有数据 -->
+    <select id="loadOutsourceAmountByMaps" resultType="com.main.model.OutsourceAllocationAmount">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM OUTSOURCE_ALLOCATION_AMOUNT
+        <where>
+            1=1
+            <if test="custId != null and custId != ''">
+                AND CUST_ID = #{custId}
+            </if>
+            <if test="ious != null and ious != ''">
+                AND IOUS = #{ious}
+            </if>
+            <if test="company != null and company != ''">
+                AND COMPANY = #{company}
+            </if>
+            <if test="nowCollectionAmount != null">
+                AND NOW_COLLECTION_AMOUNT > #{nowCollectionAmount}
+            </if>
+            <if test="transfer != null and transfer != ''">
+                AND TRANSFER = #{transfer}
+            </if>
+        </where>
+        <if test="isNotList != null and isNotList != ''">
+            LIMIT 1
+        </if>
+    </select>
+
+    <!-- 查询条件的所有数据 -->
+    <select id="loadOutsourceAmountAllLists" resultType="com.main.model.OutsourceAllocationAmount">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM OUTSOURCE_ALLOCATION_AMOUNT GROUP BY CUST_ID
+    </select>
+
+    <!-- 删除所有满足条件的数据 -->
+    <delete id="deleteOutsourceAmountOverdue">
+        DELETE FROM OUTSOURCE_ALLOCATION_AMOUNT
+        <where>
+            1=1
+            <if test="thePushDay != null and thePushDay != ''">
+                AND THE_PUSH_DAY &lt;= #{thePushDay}
+            </if>
+        </where>
+    </delete>
+
+    <!-- 公共查询所有满足条件的所有数据 -->
+    <select id="loadCommonAmountByMaps" resultType="com.main.model.OutsourceAllocationAmount">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM OUTSOURCE_ALLOCATION_AMOUNT
+        <where>
+            1=1
+            <if test="custId != null and custId != ''">
+                AND CUST_ID = #{custId}
+            </if>
+            <if test="ious != null and ious != ''">
+                AND IOUS = #{ious}
+            </if>
+            <if test="company != null and company != ''">
+                AND COMPANY = #{company}
+            </if>
+            <if test="nowCollectionAmountgt != null">
+                AND NOW_COLLECTION_AMOUNT > #{nowCollectionAmountgt}
+            </if>
+            <if test="nowCollectionAmountlt != null">
+                AND NOW_COLLECTION_AMOUNT &lt; #{nowCollectionAmountlt}
+            </if>
+            <if test="transfereq != null and transfereq != ''">
+                AND TRANSFER = #{transfereq}
+            </if>
+            <if test="startTransferTime != null and startTransferTime != ''">
+                AND TRANSFER >= #{startTransferTime}
+            </if>
+            <if test="endTransfertTime != null and endTransfertTime != ''">
+                AND TRANSFER &lt;= #{endTransfertTime}
+            </if>
+            <if test="startThePushDayTime != null and startThePushDayTime != ''">
+                AND THE_PUSH_DAY >= #{startThePushDayTime}
+            </if>
+            <if test="endThePushDayTime != null and endThePushDayTime != ''">
+                AND THE_PUSH_DAY &lt;= #{endThePushDayTime}
+            </if>
+        </where>
+        <if test="isNotList != null and isNotList != ''">
+            LIMIT 1
+        </if>
+    </select>
+
+    <insert id="insertInfo" parameterType="com.main.model.OutsourceAllocationAmount" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into
+        OUTSOURCE_ALLOCATION_AMOUNT
+        (
+         id, name, cust_id, tel_number, ious, now_collection_amount, now_agecd, transfer_agecd,
+         transfer, the_push_day, last_collection_amount, last_agecd, update_time, company, remarks,
+         creat_date, is_leave_case, leave_case_date
+        )
+        values
+        (
+         #{id,jdbcType=INTEGER},
+         #{name,jdbcType=VARCHAR},
+         #{custId,jdbcType=VARCHAR},
+         #{telNumber,jdbcType=VARCHAR},
+         #{ious,jdbcType=VARCHAR},
+         #{nowCollectionAmount,jdbcType=DOUBLE},
+         #{nowAgecd,jdbcType=INTEGER},
+         #{transferAgecd,jdbcType=INTEGER},
+         #{transfer,jdbcType=TIMESTAMP},
+         #{thePushDay,jdbcType=TIMESTAMP},
+         #{lastCollectionAmount,jdbcType=DOUBLE},
+         #{lastAgecd,jdbcType=INTEGER},
+         #{updateTime,jdbcType=TIMESTAMP},
+         #{company,jdbcType=VARCHAR},
+         #{remarks,jdbcType=VARCHAR},
+         #{creatDate,jdbcType=TIMESTAMP},
+         #{isLeaveCase,jdbcType=VARCHAR},
+		 #{leaveCaseDate,jdbcType=TIMESTAMP}
+        )
+    </insert>
 
 </mapper>

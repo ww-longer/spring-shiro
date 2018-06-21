@@ -14,26 +14,48 @@ import java.util.Date;
 public class DateUtils {
 
 	/**
-	 * 获取之前或者未来day天的日期 负数(-1):表示昨天;正数(1):表示明天
-	 * 
-	 * @return
-	 */
-	public static String getSomeday(int day, String fmt) {
-		return getSomeday(new Date(), day, fmt);
+	 * 获取当前时间之前或者未来day天的日期 负数(-1):表示昨天;正数(1):表示明天
+	 * @param day
+	 * @param fmt
+     * @return
+     */
+	public static Date getSomeday(int day, String fmt) {
+		return getSomeday(new Date(), day);
 	}
 
 	/**
 	 * 获取某个时间戳之前或未来 day 天的日期字符串
 	 * @param date
 	 * @param day
-	 * @param fmt
 	 * @return
 	 */
-	public static String getSomeday(Date date, int day, String fmt) {
+	public static Date getSomeday(Date date, int day) {
+		return getSomeYMDStr(date, 0, 0, day);
+	}
+
+	/**
+	 * 获取某个时间戳之前或未来 mouth ,day 的日期字符串
+	 * @param date
+	 * @param day
+	 * @return
+	 */
+	public static Date getSomeMouthDay(Date date, int month, int day) {
+		return getSomeYMDStr(date, 0, month, day);
+	}
+
+	/**
+	 * 获取某个时间戳之前或未来 year, mouth , day 的日期字符串
+	 * @param date
+	 * @param mouth
+	 * @return
+	 */
+	public static Date getSomeYMDStr(Date date, int year, int mouth, int day) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
+		cal.add(Calendar.YEAR, year);
+		cal.add(Calendar.MONTH, mouth);
 		cal.add(Calendar.DATE, day);
-		return new SimpleDateFormat(fmt).format(cal.getTime());
+		return cal.getTime();
 	}
 
 	/**
@@ -90,14 +112,21 @@ public class DateUtils {
 	}
 
 	/**
-	 * 通过时间秒毫秒数判断两个时间的间隔(date2 > date1)
+	 * 通过时间秒毫秒数判断两个时间的间隔(date2 > date1) : > 0
 	 * 
 	 * @param date1
 	 * @param date2
 	 * @return
 	 */
 	public static int differentDaysByMillisecond(Date date1, Date date2) {
-		int days = (int) ((date2.getTime() - date1.getTime()) / (1000 * 3600 * 24));
+		int days = 0;
+		if (date1 == null && date2 != null) {
+			days = 1;
+		} else if (date1 != null && date2 != null){
+			days = (int) ((date2.getTime() - date1.getTime()) / (1000 * 3600 * 24));
+		} else if (date1 != null && date2 == null) {
+			days = -1;
+		}
 		return days;
 	}
 
@@ -141,7 +170,10 @@ public class DateUtils {
 	}
 
 	public static void main(String[] args) {
+		Date str = new Date();
 		System.out
-				.println(DateUtils.compareStrDate("2017-01-16", "2016-01-11"));
+				.println(DateUtils.getSomeYMDStr(new Date(), 0, 1, -1));
+		System.out
+				.println(DateUtils.differentDaysByMillisecond(new Date(), str));
 	}
 }

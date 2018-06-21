@@ -19,11 +19,11 @@
             columns : [ [ {
                 field : 'name',
                 title : '资源名称',
-                width : 150
+                width : 200
             }, {
                 field : 'url',
                 title : '资源路径',
-                width : 200
+                width : 300
             }, {
                 field : 'openMode',
                 title : '打开方式',

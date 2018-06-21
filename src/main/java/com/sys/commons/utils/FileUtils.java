@@ -3,6 +3,7 @@ package com.sys.commons.utils;
 import org.apache.commons.lang.*;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
@@ -154,6 +155,57 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     }
 
     /**
+     * 删除所有文件
+     * @param path
+     * @return
+     */
+    public static boolean delAllFile(String path) {
+        boolean flag = false;
+        File file = new File(path);
+        if (!file.exists()) {
+            return flag;
+        }
+        if (!file.isDirectory()) {
+            return flag;
+        }
+        String[] tempList = file.list();
+        File temp = null;
+        for (int i = 0; i < tempList.length; i++) {
+            if (path.endsWith(File.separator)) {
+                temp = new File(path + tempList[i]);
+            } else {
+                temp = new File(path + File.separator + tempList[i]);
+            }
+            if (temp.isFile()) {
+                temp.delete();
+            }
+            if (temp.isDirectory()) {
+                delAllFile(path + "/" + tempList[i]);//先删除文件夹里面的文件
+                delFolder(path + "/" + tempList[i]);//再删除空文件夹
+                flag = true;
+            }
+        }
+        return flag;
+    }
+
+
+    /**
+     * 删除文件夹
+     * @param folderPath
+     */
+    public static void delFolder(String folderPath) {
+        try {
+            delAllFile(folderPath); //删除完里面所有内容
+            String filePath = folderPath;
+            filePath = filePath.toString();
+            java.io.File myFilePath = new java.io.File(filePath);
+            myFilePath.delete(); //删除空文件夹
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 重命名文件名(文件夹路径)
      *
      * @param filePath         需要重命名的文件路径
@@ -235,4 +287,36 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
         return tempFile;
     }
 
+
+    /**
+     * 下载文件到浏览器
+     *
+     * @param fileName path + fileName
+     * @param response
+     */
+    public static void printFileToLocal(String filePath, String fileName, HttpServletRequest request, HttpServletResponse response) {
+        OutputStream os = null;
+        try {
+            os = response.getOutputStream();
+            File file = new File(filePath + File.separator + fileName);
+            if (!file.exists()) {
+                return;
+            }
+            response.reset();
+            String userAgent = request.getHeader("USER-AGENT");
+            if (org.apache.commons.lang.StringUtils.contains(userAgent, "Mozilla")) {
+                fileName = new String(fileName.getBytes(), "ISO8859-1");
+            } else {
+                fileName = URLEncoder.encode(fileName, "utf8");
+            }
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+            response.setContentType("application/octet-stream; charset=utf-8");
+            os.write(FileUtils.readFileToByteArray(file));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            IOUtils.closeQuietly(os);
+        }
+    }
 }

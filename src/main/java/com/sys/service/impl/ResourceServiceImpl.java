@@ -1,9 +1,7 @@
 package com.sys.service.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,8 +36,11 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource> i
     private RoleResourceMapper roleResourceMapper;
     
     @Override
-    public List<Resource> selectAll() {
+    public List<Resource> selectAll(Integer id) {
         EntityWrapper<Resource> wrapper = new EntityWrapper<Resource>();
+        if (null != id) {
+            wrapper.addFilter("pid = {0}", id);
+        }
         wrapper.orderBy("seq");
         return resourceMapper.selectList(wrapper);
     }
@@ -75,10 +76,10 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource> i
     }
     
     @Override
-    public List<Tree> selectAllTree() {
+    public List<Tree> selectAllTree(Integer id) {
         // 获取所有的资源 tree形式，展示
         List<Tree> trees = new ArrayList<Tree>();
-        List<Resource> resources = this.selectAll();
+        List<Resource> resources = this.selectAll(id);
         if (resources == null) {
             return trees;
         }
@@ -96,7 +97,7 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource> i
     }
     
     @Override
-    public List<Tree> selectTree(ShiroUser shiroUser) {
+    public List<Tree> selectTree(ShiroUser shiroUser, Integer pId) {
         List<Tree> trees = new ArrayList<Tree>();
         // shiro中缓存的用户角色
         Set<String> roles = shiroUser.getRoles();
@@ -105,7 +106,12 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource> i
         }
         // 如果有超级管理员权限
         if (roles.contains("admin")) {
-            List<Resource> resourceList = this.selectByType(RESOURCE_MENU);
+            List<Resource> resourceList;
+            if (null == pId || "".equals(pId)) {
+                resourceList = this.selectByType(RESOURCE_MENU);
+            } else {
+                resourceList = this.selectByRPId(pId);
+            }
             if (resourceList == null) {
                 return trees;
             }
@@ -145,7 +151,15 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource> i
         return trees;
     }
 
-	@Override
+    @Override
+    public List<Resource> selectByRPId(int pId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("pid", pId);
+        map.put("seq", "ASC");
+        return resourceMapper.selectResourceList(map);
+    }
+
+    @Override
 	public boolean deleteById(Serializable resourceId) {
 		roleResourceMapper.deleteByResourceId(resourceId);
 		return super.deleteById(resourceId);

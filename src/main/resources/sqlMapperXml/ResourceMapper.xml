@@ -7,4 +7,22 @@
         id, name, url, description, icon, pid, seq, status, open_mode as openMode, opened, resource_type AS resourceType, create_time AS createTime
     </sql>
 
+    <!-- 查询当前菜单下子菜单 -->
+    <select id="selectResourceList" resultType="com.sys.model.Resource">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM RESOURCE
+        <where>
+            1=1
+            <if test="pid != null">
+                AND PID = #{pid}
+            </if>
+            <if test="resourceType != null">
+                AND RESOURCE_TYPE = #{resourceType}
+            </if>
+        </where>
+        <if test="seq != null">
+            ORDER BY SEQ ${seq}
+        </if>
+    </select>
 </mapper>

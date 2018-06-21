@@ -4,6 +4,7 @@ package com.sys.commons.base;
  * Created by jiewai on 2018/5/4.
  */
 public class BaseEntity {
+
     private Integer page;
     private Integer rows;
     private String sort;

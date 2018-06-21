@@ -38,39 +38,71 @@
 		SELECT <include refid="Base_Column_List"/> FROM OUTSOURCE_ALLOCATION_RECORD
 	</select>
 
+	<!-- 查询所有客户 -->
+	<select id="loadRecordALLCustData" resultType="com.main.model.OutsourceAllocationRecord">
+		SELECT <include refid="Base_Column_List"/> FROM OUTSOURCE_ALLOCATION_RECORD GROUP BY CUST_ID
+	</select>
+
+	<!-- 查询所有客户 -->
+	<select id="selectMaxTurnByCustId" resultType="com.main.model.OutsourceAllocationRecord">
+		SELECT <include refid="Base_Column_List"/>
+		FROM OUTSOURCE_ALLOCATION_RECORD
+		WHERE CUST_ID = #{custId} ORDER BY TURN_OVER_DAY DESC LIMIT 1
+	</select>
+
 	<!-- 分页查询 -->
 	<select id="selectPageInfo" resultType="Map">
 		SELECT
 		<include refid="Base_Column_List"/>
 		FROM OUTSOURCE_ALLOCATION_RECORD
 		<where>
+			1=1
 			<if test="custId != null and custId != ''">
-				cust_id = #{custId}
+				AND cust_id = #{custId}
 			</if>
 			<if test="ious != null and ious != ''">
-				ious = #{ious}
+				AND ious = #{ious}
 			</if>
 		</where>
 	</select>
 
-	<!-- 查询满足条件的所有数据 -->
-	<select id="selectByMaps" resultType="Map">
-		SELECT
-		<include refid="Base_Column_List"/>
-		FROM OUTSOURCE_ALLOCATION_RECORD
+	<!-- 查询满足条件的所有数据总数 -->
+	<select id="loadRecordByMaps" resultType="com.main.model.OutsourceAllocationRecord">
+		SELECT <include refid="Base_Column_List"/> FROM OUTSOURCE_ALLOCATION_RECORD
 		<where>
+			1=1
 			<if test="custId != null and custId != ''">
-				cust_id = #{custId}
+				AND cust_id = #{custId}
 			</if>
 			<if test="ious != null and ious != ''">
-				ious = #{ious}
+				AND ious = #{ious}
 			</if>
 		</where>
+		<if test="orderStr != null and orderStr != ''">
+			ORDER BY ${orderStr} ${orderAsc}
+		</if>
+	</select>
+
+	<!-- 查询满足条件的所有数据总数 -->
+	<select id="selectByMapCount" resultType="java.lang.Integer">
+		SELECT COUNT(1) FROM OUTSOURCE_ALLOCATION_RECORD
+		<where>
+			1=1
+			<if test="custId != null and custId != ''">
+				AND cust_id = #{custId}
+			</if>
+			<if test="ious != null and ious != ''">
+				AND ious = #{ious}
+			</if>
+		</where>
+		<if test="orderStr != null and orderStr != ''">
+			ORDER BY ${orderStr} ${orderAsc}
+		</if>
 	</select>
 
 	<!-- 删除所有表数据 -->
 	<delete id="cleanAllData">
-		DELETE FROM OUTSOURCE_ALLOCATION_RECORD
+		TRUNCATE TABLE OUTSOURCE_ALLOCATION_RECORD
 	</delete>
 
 

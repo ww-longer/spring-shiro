@@ -1,111 +1,168 @@
 package com.main.controller;
 
-import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.main.model.OutsourceAllocationRepayment;
 import com.main.service.OutsourceAllocationRepaymentService;
+import com.main.service.OutsourceCompanyService;
 import com.sys.commons.base.BaseController;
 import com.sys.commons.result.PageInfo;
+import com.sys.commons.utils.ExcelUtils;
+import com.sys.commons.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author jiewai
  * @since 2018-05-22
  */
 @Controller
-@RequestMapping("/outsourceAllocationRepayment")
+@RequestMapping("/sc/collection/refund")
 public class OutsourceAllocationRepaymentController extends BaseController {
 
-    @Autowired private OutsourceAllocationRepaymentService outsourceAllocationRepaymentService;
-    
-    @GetMapping("/manager")
-    public String manager() {
-        return "admin/outsourceAllocationRepayment/outsourceAllocationRepaymentList";
+    @Autowired
+    private OutsourceAllocationRepaymentService outsourceAllocationRepaymentService;
+    @Autowired
+    private OutsourceCompanyService outsourceCompanyService;
+
+    @GetMapping("/search")
+    public String search(Model model) {
+        model.addAttribute("companies", outsourceCompanyService.loadAllCompany());
+        return "sc_main/refund/outsourceRefundList";
     }
-    
+
     @PostMapping("/dataGrid")
     @ResponseBody
-    public PageInfo dataGrid(OutsourceAllocationRepayment outsourceAllocationRepayment, Integer page, Integer rows, String sort, String order) {
-        PageInfo pageInfo = new PageInfo(page, rows, sort, order);
-        EntityWrapper<OutsourceAllocationRepayment> ew = new EntityWrapper<OutsourceAllocationRepayment>(outsourceAllocationRepayment);
+    public PageInfo dataGrid(OutsourceAllocationRepayment repayment) {
+        PageInfo pageInfo;
+        pageInfo = new PageInfo(repayment.getPage(), repayment.getRows(), repayment.getSort(), repayment.getOrder());
+        Map<String, Object> amountMap = new HashMap<>();
+        // 创建查询参数
+        amountMap.put("custId", repayment.getCustId());
+        amountMap.put("ious", repayment.getIous());
+        amountMap.put("company", repayment.getCompany());
+        amountMap.put("startRepaymentDateTime", repayment.getStartRepaymentDateTime());
+        amountMap.put("endRepaymentDateTime", repayment.getEndRepaymentDateTime());
+        pageInfo.setCondition(amountMap);
+        outsourceAllocationRepaymentService.selectPageInfo(pageInfo);
         return pageInfo;
     }
-    
+
     /**
      * 添加页面
+     *
      * @return
      */
-    @GetMapping("/addPage")
-    public String addPage() {
-        return "admin/outsourceAllocationRepayment/outsourceAllocationRepaymentAdd";
+    @GetMapping("/uploadRepaymentHisPage")
+    public String uploadRepaymentHisPage() {
+        return "sc_main/refund/addRepaymentPage";
     }
-    
+
     /**
-     * 添加
-     * @param 
+     * 导入历史还款记录
+     * @param file
      * @return
      */
-    @PostMapping("/add")
+    @PostMapping("/uploadRepaymentExcel")
     @ResponseBody
-    public Object add(@Valid OutsourceAllocationRepayment outsourceAllocationRepayment) {
-        boolean b = outsourceAllocationRepaymentService.insert(outsourceAllocationRepayment);
-        if (b) {
-            return renderSuccess("添加成功！");
+    public Object uploadRepaymentExcel(@RequestParam("file") MultipartFile file) {
+        if (!file.isEmpty()) {
+            // 转换为 File
+            File tempFile = null;
+            try {
+                tempFile = FileUtils.multipartToFile(file);
+                // 获取导入文件中的数据
+                List<HashMap<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
+                if (listMap != null && listMap.size() > 0) {
+                    outsourceAllocationRepaymentService.importRepaymentHisExcel(listMap);
+                    return renderSuccess("文件导入成功！");
+                } else {
+                    return renderError("表文件为空！");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return renderError("文件读取失败！");
+            }
         } else {
-            return renderError("添加失败！");
+            return renderError("文件不存在！");
         }
     }
-    
+
     /**
-     * 删除
-     * @param id
+     * 导出还款记录
+     *
+     * @param
      * @return
      */
-    @PostMapping("/delete")
-    @ResponseBody
-    public Object delete(Long id) {
-        OutsourceAllocationRepayment outsourceAllocationRepayment = new OutsourceAllocationRepayment();
-        boolean b = outsourceAllocationRepaymentService.updateById(outsourceAllocationRepayment);
-        if (b) {
-            return renderSuccess("删除成功！");
-        } else {
-            return renderError("删除失败！");
-        }
+    @GetMapping("/downLoadRepaymentExp")
+    public void downLoadRepaymentExp(OutsourceAllocationRepayment repayment, HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> objectMap = new HashMap<>();
+        // 创建查询参数
+        objectMap.put("company", repayment.getCompany());
+        objectMap.put("startRepaymentDateTime", repayment.getStartRepaymentDateTime());
+        objectMap.put("endRepaymentDateTime", repayment.getEndRepaymentDateTime());
+        outsourceAllocationRepaymentService.exportInAllRepaymentByMap(objectMap, request, response);
     }
-    
+
     /**
-     * 编辑
+     * 导出所有更新余额和还款
+     *
+     * @return
+     */
+    @GetMapping("/downLoadAmountAndRepaymentExp")
+    public void downLoadAmountAndRepaymentExp(OutsourceAllocationRepayment repayment, HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> objectMap = new HashMap<>();
+        // 创建查询参数
+        objectMap.put("company", repayment.getCompany());
+        objectMap.put("startRepaymentDateTime", repayment.getStartRepaymentDateTime());
+        objectMap.put("endRepaymentDateTime", repayment.getEndRepaymentDateTime());
+        outsourceAllocationRepaymentService.exportInAmountAndRepaymentByMap(objectMap, request, response);
+    }
+
+    /**
+     * 编辑页面加载
+     *
      * @param model
      * @param id
      * @return
      */
-    @GetMapping("/editPage")
-    public String editPage(Model model, Long id) {
-        OutsourceAllocationRepayment outsourceAllocationRepayment = outsourceAllocationRepaymentService.selectById(id);
-        model.addAttribute("outsourceAllocationRepayment", outsourceAllocationRepayment);
-        return "admin/outsourceAllocationRepayment/outsourceAllocationRepaymentEdit";
+    @GetMapping("/updateRepaymentPage")
+    public String updateRepaymentPage(Model model, Integer id) {
+        model.addAttribute("repayment", outsourceAllocationRepaymentService.loadRepaymentById(id));
+        model.addAttribute("companies", outsourceCompanyService.loadAllCompany());
+        return "sc_main/refund/updateRepaymentPage";
     }
-    
+
     /**
-     * 编辑
-     * @param 
+     * 编辑更新
+     *
+     * @param
      * @return
      */
-    @PostMapping("/edit")
+    @PostMapping("/updateRepaymentById")
     @ResponseBody
-    public Object edit(@Valid OutsourceAllocationRepayment outsourceAllocationRepayment) {
-        boolean b = outsourceAllocationRepaymentService.updateById(outsourceAllocationRepayment);
+    public Object updateRepaymentById(OutsourceAllocationRepayment allocationRepayment) {
+        OutsourceAllocationRepayment repayment = outsourceAllocationRepaymentService.loadRepaymentById(allocationRepayment.getId());
+        repayment.setRemarks("SYS_金额调整,原本:" + repayment.getCurAmount() + ",现在:" + allocationRepayment.getCurAmount());
+        repayment.setIsSumRefund(allocationRepayment.getIsSumRefund());
+        repayment.setCompany(allocationRepayment.getCompany());
+        repayment.setRepaymentDate(allocationRepayment.getRepaymentDate());
+        repayment.setCurAmount(allocationRepayment.getCurAmount());
+        boolean b = outsourceAllocationRepaymentService.updateById(repayment);
         if (b) {
             return renderSuccess("编辑成功！");
         } else {

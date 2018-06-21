@@ -26,7 +26,9 @@ public interface IOutsourceAllocationRecordService extends IService<OutsourceAll
 
     List<Map<String,Object>> getMatchingData(Map<String, Object> condition);
 
-    void importInOutsourceExcel(List<HashMap<String, Object>> listMap);
+    Map<String, Object> importInOutsourceExcel(List<HashMap<String, Object>> listMap);
 
     void downLoadAllDate(HttpServletRequest request, HttpServletResponse response);
+
+    Map<String,Object> importAmountAndRecordExcel(List<HashMap<String, Object>> listMap);
 }

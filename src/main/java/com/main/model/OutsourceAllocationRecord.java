@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.enums.IdType;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
-import com.sys.commons.base.BaseEntity;
+import com.sys.commons.base.BaseController;
 
 import java.io.Serializable;
 
@@ -17,9 +17,7 @@ import java.io.Serializable;
  * @since 2018-05-03
  */
 @TableName("outsource_allocation_record")
-public class OutsourceAllocationRecord extends  BaseEntity{
-
-    private static final long serialVersionUID = 1L;
+public class OutsourceAllocationRecord extends BaseController {
 
     /**
      * 表id

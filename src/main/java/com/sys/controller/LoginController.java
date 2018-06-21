@@ -59,7 +59,7 @@ public class LoginController extends BaseController {
     @GetMapping("/login")
     @CsrfToken(create = true)
     public String login() {
-        logger.info("GET请求登录");
+        //logger.info("GET请求登录");
         if (SecurityUtils.getSubject().isAuthenticated()) {
             return "redirect:/index";
         }
@@ -79,7 +79,7 @@ public class LoginController extends BaseController {
     public Object loginPost(HttpServletRequest request, HttpServletResponse response,
             String username, String password, String captcha, 
             @RequestParam(value = "rememberMe", defaultValue = "0") Integer rememberMe) {
-        logger.info("POST请求登录");
+        //logger.info("POST请求登录");
         // 改为全部抛出异常，避免ajax csrf token被刷新
         if (StringUtils.isBlank(username)) {
             throw new RuntimeException("用户名不能为空");
@@ -130,7 +130,7 @@ public class LoginController extends BaseController {
     @PostMapping("/logout")
     @ResponseBody
     public Object logout() {
-        logger.info("登出");
+        //logger.info("登出");
         Subject subject = SecurityUtils.getSubject();
         subject.logout();
         return renderSuccess();

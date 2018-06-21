@@ -2,11 +2,18 @@
 <%@ include file="/commons/global.jsp" %>
 <script type="text/javascript">
     $(function() {
-        $('#resourceAddPid').combotree({
+/*        $('#resourceAddPid').combotree({
             url : '${path }/resource/allTree',
             parentField : 'pid',
             lines : true,
             panelHeight : 'auto'
+        });*/
+        $('#resourceAddPid').combotree({
+            url : '${path }/resource/tree',
+            parentField : 'pid',
+            lines : true,
+            panelHeight : 'auto',
+            value : '${resource.pid}'
         });
 
         $('#resourceAddForm').form({

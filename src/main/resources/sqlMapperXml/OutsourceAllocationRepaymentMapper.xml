@@ -15,12 +15,65 @@
 		<result column="hand_over_agecd" property="handOverAgecd" />
 		<result column="hand_over_amount" property="handOverAmount" />
 		<result column="company" property="company" />
+		<result column="creat_date" property="creatDate" />
+		<result column="is_sum_refund" property="isSumRefund" />
 		<result column="remarks" property="remarks" />
 	</resultMap>
 
 	<!-- 通用查询结果列 -->
 	<sql id="Base_Column_List">
-		id, name, cust_id AS custId, tel_number AS telNumber, ious, cur_amount AS curAmount, repayment_date AS repaymentDate, transfer, hand_over_agecd AS handOverAgecd, hand_over_amount AS handOverAmount, company, remarks
+		id, name, cust_id AS custId, tel_number AS telNumber, ious, cur_amount AS curAmount, repayment_date AS repaymentDate, transfer, hand_over_agecd AS handOverAgecd, hand_over_amount AS handOverAmount, company,creat_date AS creatDate, is_sum_refund AS isSumRefund, remarks
 	</sql>
+
+	<!-- 分页查询 -->
+	<select id="selectPageInfo" resultType="Map">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM OUTSOURCE_ALLOCATION_REPAYMENT
+		<where>
+			1=1
+			<if test="custId != null and custId != ''">
+				AND CUST_ID = #{custId}
+			</if>
+			<if test="ious != null and ious != ''">
+				AND IOUS = #{ious}
+			</if>
+			<if test="company != null and company != ''">
+				AND COMPANY = #{company}
+			</if>
+			<if test="startRepaymentDateTime != null and startRepaymentDateTime != ''">
+				AND REPAYMENT_DATE >= #{startRepaymentDateTime}
+			</if>
+			<if test="endRepaymentDateTime != null and endRepaymentDateTime != ''">
+				AND REPAYMENT_DATE &lt;= #{endRepaymentDateTime}
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询满足条件的所有数据 -->
+	<select id="loadAllRepaymentByMaps" resultType="com.main.model.OutsourceAllocationRepayment">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM OUTSOURCE_ALLOCATION_REPAYMENT
+		<where>
+			1=1
+			<if test="company != null and company != ''">
+				AND COMPANY = #{company}
+			</if>
+			<if test="startRepaymentDateTime != null and startRepaymentDateTime != ''">
+				AND REPAYMENT_DATE > #{startRepaymentDateTime}
+			</if>
+			<if test="endRepaymentDateTime != null and endRepaymentDateTime != ''">
+				AND REPAYMENT_DATE &lt; #{endRepaymentDateTime}
+			</if>
+		</where>
+	</select>
+
+    <!-- 根据ID查询一条 -->
+	<select id="selectById" resultType="com.main.model.OutsourceAllocationRepayment" >
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM OUTSOURCE_ALLOCATION_REPAYMENT WHERE ID = #{id}
+	</select>
 
 </mapper>

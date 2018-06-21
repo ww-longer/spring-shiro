@@ -17,10 +17,29 @@
 		id, company_number AS companyNumber, company, address, create_date AS createDate, create_user AS createUser
 	</sql>
 
-	<select id="selectAllList" resultType="Map">
+	<!-- 分页查询 -->
+	<select id="selectPageInfo" resultType="Map">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM OUTSOURCE_COMPANY
+		<where>
+			1=1
+			<if test="company != null and company != ''">
+				AND company LIKE #{company}
+			</if>
+		</where>
+	</select>
+    <!--  -->
+	<select id="selectAllList" resultType="com.main.model.OutsourceCompany">
 		SELECT
 		<include refid="Base_Column_List"/>
 		FROM OUTSOURCE_COMPANY ORDER BY COMPANY_NUMBER ASC
+	</select>
+	<!-- 查询一条 -->
+	<select id="selectById" resultType="com.main.model.OutsourceCompany">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM OUTSOURCE_COMPANY WHERE ID = #{id}
 	</select>
 
 </mapper>

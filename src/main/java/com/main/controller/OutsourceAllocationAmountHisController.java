@@ -1,12 +1,15 @@
 package com.main.controller;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import com.main.model.OutsourceAllocationAmountHis;
-import com.main.service.IOutsourceAllocationAmountService;
 import com.main.service.OutsourceAllocationAmountHisService;
 import com.sys.commons.base.BaseController;
 import com.sys.commons.result.PageInfo;
+import com.sys.commons.utils.DateUtils;
+import com.sys.commons.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +39,7 @@ public class OutsourceAllocationAmountHisController extends BaseController {
     
     @GetMapping("/search")
     public String search() {
-        return "main/outsourceAmount/outsourceAmountList";
+        return "sc_main/outsourceAmount/outsourceAmountList";
     }
     
     @PostMapping("/dataGrid")
@@ -47,6 +51,11 @@ public class OutsourceAllocationAmountHisController extends BaseController {
         // 查询参数
         amountHisMap.put("custId", amountHis.getCustId());
         amountHisMap.put("ious", amountHis.getIous());
+        amountHisMap.put("company", amountHis.getCompany());
+        amountHisMap.put("startTransferTime", amountHis.getStartTransferTime());
+        amountHisMap.put("endTransfertTime", amountHis.getEndTransferTime());
+        amountHisMap.put("startThePushDayTime", amountHis.getStartThePushDayTime());
+        amountHisMap.put("endThePushDayTime", amountHis.getEndThePushDayTime());
         pageInfo.setCondition(amountHisMap);
         outsourceAllocationAmountHisService.selectPageInfo(pageInfo);
         return pageInfo;
@@ -58,23 +67,35 @@ public class OutsourceAllocationAmountHisController extends BaseController {
      */
     @GetMapping("/addPage")
     public String addPage() {
-        return "admin/outsourceAllocationAmountHis/outsourceAllocationAmountHisAdd";
+        return "sc_main/outsourceAllocationAmountHis/outsourceAllocationAmountHisAdd";
     }
     
     /**
-     * 添加
+     * 下载导出退催清单
      * @param 
      * @return
      */
-    @PostMapping("/add")
+    @GetMapping("/downloadThePushExp")
     @ResponseBody
-    public Object add(@Valid OutsourceAllocationAmountHis outsourceAllocationAmountHis) {
-
-        boolean b = outsourceAllocationAmountHisService.insert(outsourceAllocationAmountHis);
-        if (b) {
-            return renderSuccess("添加成功！");
-        } else {
-            return renderError("添加失败！");
+    public void downloadThePushExp(OutsourceAllocationAmountHis amountHis, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            Map<String, Object> condition = new HashMap<>();
+            // 查询参数
+            String startThePushDayTime = amountHis.getStartThePushDayTime();
+            String endTransferTime = amountHis.getEndThePushDayTime();
+            // 默认导出当前日期之前的数据
+            if (StringUtils.isBlank(endTransferTime)) {
+                endTransferTime = DateUtils.dateToString(new Date(), "yyyy-MM-dd HH:mm:ss");
+            }
+            condition.put("startTransferTime", amountHis.getStartTransferTime());
+            condition.put("endTransfertTime", amountHis.getEndTransferTime());
+            condition.put("startThePushDayTime", startThePushDayTime);
+            condition.put("endThePushDayTime", endTransferTime);
+            condition.put("nowCollectionAmount", 0);
+            outsourceAllocationAmountHisService.loadAmountHisByMaps(condition, request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            renderError("导出文件异常!");
         }
     }
     
@@ -106,7 +127,7 @@ public class OutsourceAllocationAmountHisController extends BaseController {
     public String editPage(Model model, Long id) {
         OutsourceAllocationAmountHis outsourceAllocationAmountHis = outsourceAllocationAmountHisService.selectById(id);
         model.addAttribute("outsourceAllocationAmountHis", outsourceAllocationAmountHis);
-        return "admin/outsourceAllocationAmountHis/outsourceAllocationAmountHisEdit";
+        return "sc_main/outsourceAllocationAmountHis/outsourceAllocationAmountHisEdit";
     }
     
     /**
@@ -117,7 +138,6 @@ public class OutsourceAllocationAmountHisController extends BaseController {
     @PostMapping("/edit")
     @ResponseBody
     public Object edit(@Valid OutsourceAllocationAmountHis outsourceAllocationAmountHis) {
-        //outsourceAllocationAmountHis.setUpdateTime(new Date());
         boolean b = outsourceAllocationAmountHisService.updateById(outsourceAllocationAmountHis);
         if (b) {
             return renderSuccess("编辑成功！");

@@ -8,6 +8,7 @@
             parentField : 'pid',
             lines : true,
             checkbox : true,
+            value : '${resource.pid}',
             onClick : function(node) {},
             onLoadSuccess : function(node, data) {
                 progressLoad();

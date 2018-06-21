@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.main.mapper.NewAddIousMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.main.model.NewAddIous">
+		<id column="id" property="id" />
+		<result column="cust_id" property="custId" />
+		<result column="ious" property="ious" />
+		<result column="now_collection_amount" property="nowCollectionAmount" />
+		<result column="now_agecd" property="nowAgecd" />
+		<result column="company" property="company" />
+		<result column="overdue" property="overdue" />
+		<result column="net_lending_platform" property="netLendingPlatform" />
+		<result column="product_name" property="productName" />
+		<result column="overdue_principal" property="overduePrincipal" />
+		<result column="update_time" property="updateTime" />
+		<result column="creat_date" property="creatDate" />
+	</resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cust_id AS custId, ious, now_collection_amount AS nowCollectionAmount, now_agecd AS nowAgecd,
+        company, overdue, net_lending_platform AS netLendingPlatform, product_name AS productName,
+        overdue_principal AS overduePrincipal, update_time AS updateTime, creat_date AS creatDate
+    </sql>
+
+	<!-- 查询所有数据 -->
+	<select id="loadAllNewAddIous" resultType="com.main.model.NewAddIous" >
+		SELECT <include refid="Base_Column_List"/> FROM NEW_ADD_IOUS
+	</select>
+
+	<select id="selectPageInfo" resultType="Map">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM NEW_ADD_IOUS
+		<where>
+			1=1
+			<if test="custId != null and custId != ''">
+				AND CUST_ID = #{custId}
+			</if>
+			<if test="ious != null and ious != ''">
+				AND IOUS = #{ious}
+			</if>
+			<if test="company != null and company != ''">
+				AND COMPANY = #{company}
+			</if>
+		</where>
+	</select>
+
+	<select id="loadOneByMaps" resultType="com.main.model.NewAddIous">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM NEW_ADD_IOUS
+		<where>
+			1=1
+			<if test="custId != null and custId != ''">
+				AND CUST_ID = #{custId}
+			</if>
+			<if test="ious != null and ious != ''">
+				AND IOUS = #{ious}
+			</if>
+		</where>
+		limit 1
+	</select>
+	<!-- 根据map中的条件查询数据 -->
+	<select id="loadNewAddIousByMaps" resultType="com.main.model.NewAddIous">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM NEW_ADD_IOUS
+		<where>
+			1=1
+			<if test="custId != null and custId != ''">
+				AND CUST_ID = #{custId}
+			</if>
+			<if test="ious != null and ious != ''">
+				AND IOUS = #{ious}
+			</if>
+			<if test="iouss != null and iouss != ''">
+				AND IOUS in (${iouss})
+			</if>
+		</where>
+	</select>
+
+	<delete id="clearAllDate" >
+		TRUNCATE TABLE NEW_ADD_IOUS
+	</delete>
+
+</mapper>

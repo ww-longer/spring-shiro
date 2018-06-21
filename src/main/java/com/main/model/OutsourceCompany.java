@@ -1,21 +1,13 @@
 package com.main.model;
 
+import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.enums.IdType;
 
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import com.sys.commons.base.BaseController;
 
 /**
  * <p>
@@ -25,7 +17,8 @@ import java.util.Map;
  * @author jiewai
  * @since 2018-05-03
  */
-public class OutsourceCompany extends Model<OutsourceCompany> {
+@TableName("outsource_company")
+public class OutsourceCompany extends BaseController {
 
     private static final long serialVersionUID = 1L;
 
@@ -104,9 +97,28 @@ public class OutsourceCompany extends Model<OutsourceCompany> {
 		this.createUser = createUser;
 	}
 
-	@Override
-	protected Serializable pkVal() {
-		return this.id;
+	public static void main(String[] args) throws IOException {
+		String path ="D:";   // 这边文件目录需改成相对路径
+		File file = new File(path,"examination.txt");
+		FileReader fr = new FileReader(file);  //字符输入流
+		BufferedReader br = new BufferedReader(fr);  //使文件可按行读取并具有缓冲功能
+		StringBuffer strB = new StringBuffer();   //strB用来存储jsp.txt文件里的内容
+		String str = br.readLine();
+		strB.append("<table border='1'>");
+		while(str!=null){
+			strB.append("<tr>");
+			String[] strArray = str.split(",");
+			for(int i = 0; i< strArray.length; i ++){
+				strB.append("<td>"+ strArray[i] + "</td>");   //将读取的内容放入strB
+			}
+			strB.append("</tr>");
+			str = br.readLine();
+		}
+		strB.append("</table>");
+
+		br.close();    //关闭输入流
+
+		System.out.print(strB);
 	}
 
 }

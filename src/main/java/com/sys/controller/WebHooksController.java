@@ -34,7 +34,7 @@ public class WebHooksController extends BaseController {
         if (StringUtils.isBlank(hook)) {
             return renderError("json hook isBlank!");
         }
-        logger.info("webhooks json: {}", hook);
+        //logger.info("webhooks json: {}", hook);
         Map<String, Object> hookMap = JsonUtils.parse(hook, Map.class);
         // 发送事件 ThreadPoolTaskExecutor
         SpringUtils.publishEvent(new WebHooksEvent(hookMap));

@@ -18,5 +18,15 @@ import java.util.Map;
  */
 public interface OutsourceAllocationAmountMapper extends BaseMapper<OutsourceAllocationAmount> {
 
+    Integer insertInfo(OutsourceAllocationAmount amount);
+
     List<Map<String,Object>> selectPageInfo(Page<Map<String, Object>> page, Map<String, Object> condition);
+
+    List<OutsourceAllocationAmount> loadOutsourceAmountByMaps(Map<String, Object> map);
+
+    void deleteOutsourceAmountOverdue(Map<String, Object> map);
+
+    List<OutsourceAllocationAmount> loadOutsourceAmountAllLists();
+
+    List<OutsourceAllocationAmount> loadCommonAmountByMaps(Map<String, Object> map);
 }

@@ -10,7 +10,6 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -264,18 +263,18 @@ public class ExcelUtils {
                 String header = headers.get(i);
                 if (cell != null) {
                     if (header != null && !"".equals(header)) {
-                        DecimalFormat df = new DecimalFormat("#");
+                        DecimalFormat df = new DecimalFormat("#.#########");
                         switch (cell.getCellType()) {
                             case XSSFCell.CELL_TYPE_STRING:
                                 value = cell.getRichStringCellValue().getString().trim();
                                 break;
-                            case HSSFCell.CELL_TYPE_NUMERIC:
+                            case XSSFCell.CELL_TYPE_NUMERIC:
                                 value = df.format(cell.getNumericCellValue()).toString();
                                 break;
-                            case HSSFCell.CELL_TYPE_BOOLEAN:
+                            case XSSFCell.CELL_TYPE_BOOLEAN:
                                 value = String.valueOf(cell.getBooleanCellValue()).trim();
                                 break;
-                            case HSSFCell.CELL_TYPE_FORMULA:
+                            case XSSFCell.CELL_TYPE_FORMULA:
                                 value = cell.getCellFormula();
                                 break;
                             default:
@@ -440,6 +439,24 @@ public class ExcelUtils {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 输出Excel 到本地本地磁盘文件夹
+     * @param outFilePath
+     * @param outFileName
+     * @param wb
+     */
+    public static void printExcelFileToLocal(String outFilePath, String outFileName, Workbook wb) {
+        try {
+            FileUtils.creatFileOrPath(outFilePath, "");
+            FileOutputStream fout = new FileOutputStream(outFilePath + File.separator + outFileName);
+            wb.write(fout);
+            fout.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     public static void main(String[] args) {

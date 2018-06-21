@@ -1,5 +1,6 @@
 package com.main.mapper;
 
+import com.baomidou.mybatisplus.plugins.Page;
 import com.main.model.OutsourceCompany;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 
@@ -16,5 +17,9 @@ import java.util.Map;
  */
 public interface OutsourceCompanyMapper extends BaseMapper<OutsourceCompany> {
 
-    List<Map<String,Object>> selectAllList();
+    List<OutsourceCompany> selectAllList();
+
+    List<Map<String,Object>> selectPageInfo(Page<Map<String, Object>> page, Map<String, Object> condition);
+
+    OutsourceCompany selectById(Long id);
 }

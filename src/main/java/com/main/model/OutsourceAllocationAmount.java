@@ -3,11 +3,9 @@ package com.main.model;
 import com.baomidou.mybatisplus.enums.IdType;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
-import com.sys.commons.base.BaseEntity;
+import com.sys.commons.base.BaseController;
 
-import java.io.Serializable;
 
 /**
  * <p>
@@ -15,12 +13,10 @@ import java.io.Serializable;
  * </p>
  *
  * @author jiewai
- * @since 2018-05-22
+ * @since 2018-05-23
  */
 @TableName("outsource_allocation_amount")
-public class OutsourceAllocationAmount extends BaseEntity {
-
-    private static final long serialVersionUID = 1L;
+public class OutsourceAllocationAmount extends BaseController {
 
     /**
      * 表ID
@@ -34,12 +30,10 @@ public class OutsourceAllocationAmount extends BaseEntity {
     /**
      * 身份证号
      */
-	@TableField("cust_id")
 	private String custId;
     /**
      * 手机号
      */
-	@TableField("tel_number")
 	private String telNumber;
     /**
      * 借据号
@@ -48,13 +42,15 @@ public class OutsourceAllocationAmount extends BaseEntity {
     /**
      * 最新催收金额
      */
-	@TableField("now_collection_amount")
 	private Double nowCollectionAmount;
     /**
      * 最新账龄
      */
-	@TableField("now_agecd")
 	private Integer nowAgecd;
+	/**
+	 * 移交账龄
+	 */
+	private Integer transferAgecd;
     /**
      * 移交日
      */
@@ -62,28 +58,45 @@ public class OutsourceAllocationAmount extends BaseEntity {
     /**
      * 出催日期
      */
-	@TableField("the_push_day")
 	private Date thePushDay;
     /**
      * 上次催收金额
      */
-	@TableField("last_collection_amount")
 	private Double lastCollectionAmount;
     /**
      * 上次账龄
      */
-	@TableField("last_agecd")
 	private Integer lastAgecd;
     /**
      * 最近更新时间或创建时间
      */
-	@TableField("update_time")
 	private Date updateTime;
+    /**
+     * 公司
+     */
+	private String company;
     /**
      * 备注
      */
 	private String remarks;
+	/**
+	 * 创建时间
+	 */
+	private Date creatDate;
+	/**
+	 *	是否留案
+	 */
+	private String isLeaveCase;
+	/**
+	 *	留案日期(操作日期)
+	 */
+	private Date leaveCaseDate;
 
+
+	private String startTransferTime;
+	private String endTransferTime;
+	private String startThePushDayTime;
+	private String endThePushDayTime;
 
 	public Integer getId() {
 		return id;
@@ -141,6 +154,14 @@ public class OutsourceAllocationAmount extends BaseEntity {
 		this.nowAgecd = nowAgecd;
 	}
 
+	public Integer getTransferAgecd() {
+		return transferAgecd;
+	}
+
+	public void setTransferAgecd(Integer transferAgecd) {
+		this.transferAgecd = transferAgecd;
+	}
+
 	public Date getTransfer() {
 		return transfer;
 	}
@@ -181,6 +202,14 @@ public class OutsourceAllocationAmount extends BaseEntity {
 		this.updateTime = updateTime;
 	}
 
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
 	public String getRemarks() {
 		return remarks;
 	}
@@ -189,4 +218,59 @@ public class OutsourceAllocationAmount extends BaseEntity {
 		this.remarks = remarks;
 	}
 
+	public Date getCreatDate() {
+		return creatDate;
+	}
+
+	public void setCreatDate(Date creatDate) {
+		this.creatDate = creatDate;
+	}
+
+	public String getIsLeaveCase() {
+		return isLeaveCase;
+	}
+
+	public void setIsLeaveCase(String isLeaveCase) {
+		this.isLeaveCase = isLeaveCase;
+	}
+
+	public Date getLeaveCaseDate() {
+		return leaveCaseDate;
+	}
+
+	public void setLeaveCaseDate(Date leaveCaseDate) {
+		this.leaveCaseDate = leaveCaseDate;
+	}
+
+	public String getStartTransferTime() {
+		return startTransferTime;
+	}
+
+	public void setStartTransferTime(String startTransferTime) {
+		this.startTransferTime = startTransferTime;
+	}
+
+	public String getEndTransferTime() {
+		return endTransferTime;
+	}
+
+	public void setEndTransferTime(String endTransferTime) {
+		this.endTransferTime = endTransferTime;
+	}
+
+	public String getStartThePushDayTime() {
+		return startThePushDayTime;
+	}
+
+	public void setStartThePushDayTime(String startThePushDayTime) {
+		this.startThePushDayTime = startThePushDayTime;
+	}
+
+	public String getEndThePushDayTime() {
+		return endThePushDayTime;
+	}
+
+	public void setEndThePushDayTime(String endThePushDayTime) {
+		this.endThePushDayTime = endThePushDayTime;
+	}
 }

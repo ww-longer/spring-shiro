@@ -36,9 +36,9 @@ public class ResourceController extends BaseController {
      */
     @PostMapping("/tree")
     @ResponseBody
-    public Object tree() {
+    public Object tree(Integer id) {
         ShiroUser shiroUser = getShiroUser();
-        return resourceService.selectTree(shiroUser);
+        return resourceService.selectTree(shiroUser, id);
     }
 
     /**
@@ -59,7 +59,7 @@ public class ResourceController extends BaseController {
     @PostMapping("/treeGrid")
     @ResponseBody
     public Object treeGrid() {
-        return resourceService.selectAll();
+        return resourceService.selectAll(null);
     }
 
     /**
@@ -105,8 +105,8 @@ public class ResourceController extends BaseController {
      */
     @RequestMapping("/allTrees")
     @ResponseBody
-    public Object allTree() {
-        return resourceService.selectAllTree();
+    public Object allTree(Integer id) {
+        return resourceService.selectAllTree(id);
     }
 
     /**

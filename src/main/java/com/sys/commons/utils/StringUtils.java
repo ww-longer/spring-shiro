@@ -2,6 +2,7 @@ package com.sys.commons.utils;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * 继承自Spring util的工具类，减少jar依赖
@@ -20,7 +21,7 @@ public class StringUtils extends org.springframework.util.StringUtils {
      * StringUtils.isBlank("12345") = false
      * StringUtils.isBlank(" 12345 ") = false
      * </pre>
-     * @param str the {@code CharSequence} to check (may be {@code null})
+     * @param cs the {@code CharSequence} to check (may be {@code null})
      * @return {@code true} if the {@code CharSequence} is not {@code null},
      * its length is greater than 0, and it does not contain whitespace only
      * @see Character#isWhitespace
@@ -77,5 +78,19 @@ public class StringUtils extends org.springframework.util.StringUtils {
      */
     public static String getUUId() {
         return UUID.randomUUID().toString();
+    }
+
+    /**
+     * 判断当前字符串是不是数字
+     * @param str
+     * @return
+     */
+    public static boolean isNumber(String str){
+        boolean bool = false;
+        Pattern pattern = Pattern.compile("^[1-9]\\d*\\.\\d*|0\\.\\d*[1-9]\\d*|0?\\.0+|0|(-([1-9]\\d*\\.\\d*|0\\.\\d*[1-9]\\d*))|0?\\.0+|-?[1-9]\\d*$");
+        if (str != null && !"".equals(str) && pattern.matcher(str).matches()) {
+            bool = true;
+        }
+        return bool;
     }
 }

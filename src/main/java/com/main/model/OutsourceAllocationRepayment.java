@@ -4,9 +4,8 @@ import com.baomidou.mybatisplus.enums.IdType;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
-import java.io.Serializable;
+import com.sys.commons.base.BaseEntity;
 
 /**
  * <p>
@@ -17,9 +16,7 @@ import java.io.Serializable;
  * @since 2018-05-22
  */
 @TableName("outsource_allocation_repayment")
-public class OutsourceAllocationRepayment extends Model<OutsourceAllocationRepayment> {
-
-    private static final long serialVersionUID = 1L;
+public class OutsourceAllocationRepayment extends BaseEntity {
 
     /**
      * 表ID
@@ -45,7 +42,7 @@ public class OutsourceAllocationRepayment extends Model<OutsourceAllocationRepay
      */
 	private String ious;
     /**
-     * 当前金额
+     * 还款金额
      */
 	@TableField("cur_amount")
 	private Double curAmount;
@@ -53,7 +50,7 @@ public class OutsourceAllocationRepayment extends Model<OutsourceAllocationRepay
      * 还款日期
      */
 	@TableField("repayment_date")
-	private String repaymentDate;
+	private Date repaymentDate;
     /**
      * 移交日期
      */
@@ -72,10 +69,21 @@ public class OutsourceAllocationRepayment extends Model<OutsourceAllocationRepay
      * 公司
      */
 	private String company;
+	/**
+	 * 创建日期
+	 */
+	private Date creatDate;
+	/**
+	 * 是否全额还款(0-全额,1-部分)
+	 */
+	private Integer isSumRefund;
     /**
      * 备注
      */
 	private String remarks;
+
+	private String startRepaymentDateTime;
+	private String endRepaymentDateTime;
 
 
 	public Integer getId() {
@@ -126,11 +134,11 @@ public class OutsourceAllocationRepayment extends Model<OutsourceAllocationRepay
 		this.curAmount = curAmount;
 	}
 
-	public String getRepaymentDate() {
+	public Date getRepaymentDate() {
 		return repaymentDate;
 	}
 
-	public void setRepaymentDate(String repaymentDate) {
+	public void setRepaymentDate(Date repaymentDate) {
 		this.repaymentDate = repaymentDate;
 	}
 
@@ -166,6 +174,22 @@ public class OutsourceAllocationRepayment extends Model<OutsourceAllocationRepay
 		this.company = company;
 	}
 
+	public Date getCreatDate() {
+		return creatDate;
+	}
+
+	public void setCreatDate(Date creatDate) {
+		this.creatDate = creatDate;
+	}
+
+	public Integer getIsSumRefund() {
+		return isSumRefund;
+	}
+
+	public void setIsSumRefund(Integer isSumRefund) {
+		this.isSumRefund = isSumRefund;
+	}
+
 	public String getRemarks() {
 		return remarks;
 	}
@@ -174,9 +198,19 @@ public class OutsourceAllocationRepayment extends Model<OutsourceAllocationRepay
 		this.remarks = remarks;
 	}
 
-	@Override
-	protected Serializable pkVal() {
-		return this.id;
+	public String getStartRepaymentDateTime() {
+		return startRepaymentDateTime;
 	}
 
+	public void setStartRepaymentDateTime(String startRepaymentDateTime) {
+		this.startRepaymentDateTime = startRepaymentDateTime;
+	}
+
+	public String getEndRepaymentDateTime() {
+		return endRepaymentDateTime;
+	}
+
+	public void setEndRepaymentDateTime(String endRepaymentDateTime) {
+		this.endRepaymentDateTime = endRepaymentDateTime;
+	}
 }

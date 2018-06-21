@@ -14,12 +14,13 @@ import com.sys.model.Resource;
  */
 public interface IResourceService extends IService<Resource> {
 
-    List<Resource> selectAll();
+    List<Resource> selectAll(Integer id);
 
     List<Tree> selectAllMenu();
 
-    List<Tree> selectAllTree();
+    List<Tree> selectAllTree(Integer id);
 
-    List<Tree> selectTree(ShiroUser shiroUser);
+    List<Tree> selectTree(ShiroUser shiroUser, Integer rId);
 
+    List<Resource> selectByRPId(int resourceMenu);
 }
