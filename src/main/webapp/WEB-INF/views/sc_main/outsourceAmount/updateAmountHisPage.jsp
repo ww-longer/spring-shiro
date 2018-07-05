@@ -2,8 +2,8 @@
 <%@ include file="/commons/global.jsp" %>
 <script type="text/javascript">
     $(function() {
-        $('#updateAmountForm').form({
-            url : '${path}/sc/collection/outsourceBalance/updateAmountByCustId',
+        $('#updateAmountHisForm').form({
+            url : '${path}/sc/collection/outsourceBalance/updateAmountHisByCustId',
             onSubmit : function() {
                 progressLoad();
                 var isValid = $(this).form('validate');
@@ -16,10 +16,10 @@
                 progressClose();
                 result = $.parseJSON(result);
                 if (result.success) {
-                    outsourceAmountDataGrid();
+                    outsourceAmountHisDataGrid();
                     parent.$.modalDialog.handler.dialog('close');
                 } else {
-                    var form = $('#updateAmountForm');
+                    var form = $('#updateAmountHisForm');
                     parent.$.messager.alert('提示', eval(result.msg), 'warning');
                 }
             }
@@ -27,14 +27,14 @@
     });
 </script>
 <div style="padding:35px 50px;">
-    <form id="updateAmountForm" method="post">
+    <form id="updateAmountHisForm" method="post">
         <table>
             <tr>
                 <td><span>姓名</span></td>
                 <td>
                     <span class="input">
-                        <input type="hidden" name="id" value="${amount.id}"/>
-                        <input type="text" name="name" value="${amount.name}" readonly="readonly"/>
+                        <input type="hidden" name="id" value="${amountHis.id}"/>
+                        <input type="text" name="name" value="${amountHis.name}" readonly="readonly"/>
                     </span>
                 </td>
             </tr>
@@ -42,7 +42,7 @@
                 <td><span>身份证号</span></td>
                 <td>
                     <span class="input">
-                        <input type="text" name="custId" value="${amount.custId}" readonly="readonly"/>
+                        <input type="text" name="custId" value="${amountHis.custId}" readonly="readonly"/>
                     </span>
                 </td>
             </tr>
@@ -50,7 +50,7 @@
                 <td><span>借据号</span></td>
                 <td>
                     <span class="input">
-                        <input type="text" name="ious" value="${amount.ious}" readonly="readonly"/>
+                        <input type="text" name="ious" value="${amountHis.ious}" readonly="readonly"/>
                     </span>
                 </td>
             </tr>
@@ -80,10 +80,10 @@
                     <span class="input">
                         <select name="company" style="width:200px;height:20px;border-radius: 5px;">
                             <c:forEach items="${companies}" var="item">
-                                <c:if test="${item.company eq amount.company}">
+                                <c:if test="${item.company eq amountHis.company}">
                                     <option value="${item.company}" selected="selected">${item.company}</option>
                                 </c:if>
-                                <c:if test="${item.company ne amount.company}">
+                                <c:if test="${item.company ne amountHis.company}">
                                     <option value="${item.company}">${item.company}</option>
                                 </c:if>
                             </c:forEach>
@@ -95,22 +95,13 @@
                 <td><span>是否留案</span></td>
                 <td>
                     <span class="input">
-                        <c:if test="${amount.isLeaveCase == 'Y'}" >
+                        <c:if test="${amountHis.isLeaveCase == 'Y'}" >
                             <input type="checkbox" name="isLeaveCase" value="Y" checked="checked"/>
                         </c:if>
-                        <c:if test="${amount.isLeaveCase != 'Y'}" >
+                        <c:if test="${amountHis.isLeaveCase != 'Y'}" >
                             <input type="checkbox" name="isLeaveCase" value="Y" />
                         </c:if>
                         <span style="color: red">留案请勾选</span>
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td><span>应用所有借据</span></td>
-                <td>
-                    <span class="input">
-                        <input type="checkbox" name="isAllCase" value="Y" checked="checked"/>
-                        <span style="color: red">不勾选的情况下只修改当前借据(默认修改当前客户所有借据)</span>
                     </span>
                 </td>
             </tr>

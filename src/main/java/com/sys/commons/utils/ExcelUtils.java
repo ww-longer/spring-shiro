@@ -218,11 +218,11 @@ public class ExcelUtils {
         return maps;
     }
 
-    public static List<HashMap<String, Object>> loadAllExcelData(File file) {
+    public static List<Map<String, Object>> loadAllExcelData(File file) {
         // 检查
         preReadCheck(file.getPath());
-        Workbook workbook = null;
-        List<HashMap<String, Object>> source = null;
+        Workbook workbook;
+        List<Map<String, Object>> source = null;
         try {
             workbook = getWorkbook(file);
             if (workbook.getNumberOfSheets() <= 0)
@@ -239,15 +239,15 @@ public class ExcelUtils {
         return source;
     }
 
-    private static List<HashMap<String, Object>> loadSheet(Sheet sheet) {
+    private static List<Map<String, Object>> loadSheet(Sheet sheet) {
         Iterator<Row> rows = sheet.iterator();
-        List<HashMap<String, Object>> source = new ArrayList<>();
+        List<Map<String, Object>> source = new ArrayList<>();
         Row row = rows.next();
-        HashMap<Integer, String> headers = new HashMap<>();
+        Map<Integer, String> headers = new HashMap<>();
         int index = 0;
         for (int i = 0; i < row.getLastCellNum(); i++) {
             Cell cell = row.getCell(i);
-            String value = null;
+            String value;
             if (cell != null) {
                 value = cell.toString();
                 headers.put(i, value);
@@ -255,11 +255,11 @@ public class ExcelUtils {
             index++;
         }
         while (rows.hasNext()) {
-            HashMap<String, Object> lhhead = new HashMap<>();
+            Map<String, Object> lhhead = new HashMap<>();
             Row r = rows.next();
             for (int i = 0; i < index; i++) {
                 Cell cell = r.getCell(i);
-                Object value = null;
+                Object value;
                 String header = headers.get(i);
                 if (cell != null) {
                     if (header != null && !"".equals(header)) {
@@ -269,7 +269,7 @@ public class ExcelUtils {
                                 value = cell.getRichStringCellValue().getString().trim();
                                 break;
                             case XSSFCell.CELL_TYPE_NUMERIC:
-                                value = df.format(cell.getNumericCellValue()).toString();
+                                value = df.format(cell.getNumericCellValue());
                                 break;
                             case XSSFCell.CELL_TYPE_BOOLEAN:
                                 value = String.valueOf(cell.getBooleanCellValue()).trim();
@@ -369,7 +369,7 @@ public class ExcelUtils {
             ExcelUtils.creatExcels(outFilePath, outFileName, contents,
                     sheetName);
         }
-        Iterator<String> iter = collectionCaseMap.keySet().iterator();
+        Iterator iter = collectionCaseMap.keySet().iterator();
         FileInputStream fs;
         try {
             fs = new FileInputStream(outFilePath + outFileName);
@@ -384,7 +384,7 @@ public class ExcelUtils {
                     + outFileName); // 向已存在文件中写数据
             int i = (sheet.getLastRowNum() + 1);
             while (iter.hasNext()) {
-                String key = iter.next();
+                String key = (String) iter.next();
                 if (key != null && !"HEAD".equals(key) && !"".equals(key)) {
                     Map map = (Map) collectionCaseMap.get(key);
                     row = sheet.createRow(i); // 在现有行号后追加数据
@@ -400,20 +400,15 @@ public class ExcelUtils {
             wb.write(out);
             out.close();
             System.out.println(sheetName + "文件写出完成!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (EncryptedDocumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidFormatException e) {
+        } catch (IOException | EncryptedDocumentException | InvalidFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     /**
-     *  Excel 文件写入并下载导出到浏览器
+     * Excel 文件写入并下载导出到浏览器
+     *
      * @param fileName
      * @param wb
      * @param request
@@ -421,7 +416,7 @@ public class ExcelUtils {
      */
     public static void writeFileToClient(String fileName, Workbook wb, HttpServletRequest request, HttpServletResponse response) {
         try {
-            OutputStream fos = null;
+            OutputStream fos;
             fos = response.getOutputStream();
             String userAgent = request.getHeader("USER-AGENT");
             if (org.apache.commons.lang.StringUtils.contains(userAgent, "Mozilla")) {
@@ -442,6 +437,7 @@ public class ExcelUtils {
 
     /**
      * 输出Excel 到本地本地磁盘文件夹
+     *
      * @param outFilePath
      * @param outFileName
      * @param wb
@@ -456,7 +452,6 @@ public class ExcelUtils {
             e.printStackTrace();
         }
     }
-
 
 
     public static void main(String[] args) {

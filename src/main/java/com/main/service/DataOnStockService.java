@@ -3,8 +3,8 @@ package com.main.service;
 import com.main.model.DataOnStock;
 import com.baomidou.mybatisplus.service.IService;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -16,6 +16,6 @@ import java.util.List;
  */
 public interface DataOnStockService extends IService<DataOnStock> {
 
-    void importdataOnStockExcel(List<HashMap<String, Object>> listMap);
+    void importdataOnStockExcel(List<Map<String, Object>> listMap);
 
 }

@@ -130,10 +130,11 @@
          * bool ---- 是否显示图例
          * size ---- 显示图形的比例达大小
          * */
-        "fanShaped" : function (tag, counts, color, text, bool, size){
+        fanShaped : function (tag, counts, color, text, bool, size){
             $(tag).highcharts({
                 chart: {
-                    height: 290,        //图表的高度。默认高度是根据容器 div 的高度值计算而来，如果容器没有设置高度值，则是 400px。
+                    width: 700,
+                    height: 640,        //图表的高度。默认高度是根据容器 div 的高度值计算而来，如果容器没有设置高度值，则是 400px。
                     type: 'bar',       //指定绘制区所要绘制的图的类型，例如：type=bar为柱图，type=line为线图
                     spacingTop: 0,          //图与边框之间的距离
                     spacingRight:0,
@@ -154,7 +155,7 @@
                 plotOptions: {
                     pie: {
                         allowPointSelect: true,
-                        borderWidth:0,              //边框宽度
+                        borderWidth:1,              //边框宽度
                         borderColor: '#FFFFFF',     //边框颜色
                         cursor: 'pointer',          //鼠标形状
                         colors:color,       //每块饼图的颜色,从12点的位置开始,顺时针排列
@@ -171,6 +172,7 @@
                 series: [{
                     type: 'pie',            //显示的图像类型(饼图, 折线图, 条形图...)
                     name: ' ',
+                    size: '95%', // 指定饼图大小
                     sliced:true,
                     data: counts             //饼图的显示数据
                 }],
@@ -181,6 +183,82 @@
                     position:{                  // 位置设置
                         align: 'center'
                     }
+                }
+            });
+        },
+        /**
+         *
+         * @param target
+         * @param type
+         * @param color
+         * @param names
+         * @param massageData
+         */
+        doubleFanShaped1 : function (target, type, color, names, massageData) {
+            $(target).highcharts({
+                chart: {
+                    type: type,
+                    height: 520,
+                    marginTop: 20
+                },
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    categories: names
+                },
+                yAxis: {
+                    title: {
+                        text: null
+                    }
+                },
+                legend: {
+                    align: 'right',
+                    x: -20,
+                    verticalAlign: 'top',
+                    y: -9,
+                    floating: true,
+                    borderColor: '#CCC',
+                    borderWidth: 1,
+                    shadow: false
+                },
+                tooltip: {
+                    borderRadius: 15,
+                    formatter: function () {
+                        var bl = (this.y/this.point.count ) * 100;
+                        return '<b>' + this.series.name + '</b><br/>' +
+                            this.point.name + ': ' + this.y + ',  占比:' + bl.toFixed(2) + '%<br/>';
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        borderWidth: 0.5,              //边框宽度
+                        borderColor: '#FFFFFF',     //边框颜色
+                        cursor: 'pointer',          //鼠标形状
+                        colors: color,       //每块饼图的颜色,从12点的位置开始,顺时针排列
+                        dataLabels: {
+                            enabled: true //图例
+                        },
+                        center: ['50%', '50%'],     //相对于显示框的位置比例(宽, 高)
+                        innerSize: 0,             //饼图内的空心圆大小
+                        size: '90%',               //饼图的相识比例大小
+                        slicedOffset: 0,         //点击饼图扇形区域后偏移的距离大小
+                        startAngle: 0             //第一个扇形起始的边界
+                    }
+                },
+                series: [{
+                    name: '公司',
+                    data: massageData[0],
+                    size: '60%' // 指定饼图大小
+                }, {
+                    name: '账龄',
+                    data: massageData[1],
+                    size: '100%',  // 指定大小
+                    innerSize: '60%' // 指定内环大小
+                }],
+                credits: {
+                    enabled: false              // 禁用版权信息
                 }
             });
         }

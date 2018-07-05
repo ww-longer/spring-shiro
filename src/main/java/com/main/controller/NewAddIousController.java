@@ -83,11 +83,11 @@ public class NewAddIousController extends BaseController {
     public Object uploadDataOnStockExp(@RequestParam("newFile") MultipartFile newFile) {
         if (!newFile.isEmpty()) {
             // 转换为 File
-            File tempFile = null;
+            File tempFile;
             try {
                 tempFile = FileUtils.multipartToFile(newFile);
                 // 获取导入文件中的数据
-                List<HashMap<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
+                List<Map<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
                 dataOnStockService.importdataOnStockExcel(listMap);
                 return renderSuccess("文件导入成功！");
             } catch (IOException e) {
@@ -117,8 +117,8 @@ public class NewAddIousController extends BaseController {
     
     /**
      * 编辑
-     * @param 
-     * @return
+     * @param newAddIous q
+     * @return w
      */
     @PostMapping("/edit")
     @ResponseBody

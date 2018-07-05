@@ -2,9 +2,11 @@ package com.sys.commons.utils;
 
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.cglib.beans.BeanGenerator;
 import org.springframework.cglib.beans.BeanMap;
@@ -189,5 +191,18 @@ public final class BeanUtils extends org.springframework.beans.BeanUtils {
 		}
 		return bean;
 	}
+
+	/**
+	 * 转 Map 为 Bean
+	 */
+	public static <T> T mapToBean(Map<String, Object> beanMap, T t) {
+		try {
+			org.apache.commons.beanutils.BeanUtils.populate(t, beanMap);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		return t;
+	}
+
 
 }

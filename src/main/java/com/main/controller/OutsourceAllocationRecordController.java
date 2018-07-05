@@ -4,27 +4,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.*;
-
-import java.util.Date;
 import java.util.HashMap;
 
 import java.util.List;
 import java.util.Map;
 
+import com.main.mapper.OutsourceCompanyMapper;
+import com.main.model.OutsourceCompany;
 import com.sys.commons.base.BaseController;
-
 import com.sys.commons.result.PageInfo;
-
-import com.sys.commons.utils.DateUtils;
 import com.sys.commons.utils.ExcelUtils;
 import com.sys.commons.utils.FileUtils;
 
 import com.sys.commons.utils.StringUtils;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.main.model.OutsourceAllocationRecord;
 import com.main.service.IOutsourceAllocationRecordService;
@@ -44,7 +39,8 @@ public class OutsourceAllocationRecordController extends BaseController {
 
     @Autowired
     private IOutsourceAllocationRecordService outsourceAllocationRecordService;
-
+    @Autowired
+    private OutsourceCompanyMapper companyMapper;
     @GetMapping("/outsource")
     public String manager() {
         return "sc_main/outsourceAllocationRecord/outsourceAllocationRecordList";
@@ -56,6 +52,9 @@ public class OutsourceAllocationRecordController extends BaseController {
         PageInfo pageInfo = new PageInfo(record.getPage(), record.getRows(), record.getSort(), record.getOrder());
         Map<String, Object> condition = new HashMap<>();
         // 查询参数
+        if (StringUtils.isNotBlank(record.getName())) {
+            condition.put("name","%" + record.getName() + "%");
+        }
         condition.put("custId", record.getCustId());
         condition.put("ious", record.getIous());
         pageInfo.setCondition(condition);
@@ -63,67 +62,46 @@ public class OutsourceAllocationRecordController extends BaseController {
         return pageInfo;
     }
 
+    /**
+     * 委外过的公司匹配
+     * @param record
+     * @param model
+     * @return
+     */
     @PostMapping("/matching")
     @ResponseBody
-    public PageInfo matching(OutsourceAllocationRecord record) {
+    public PageInfo matching(OutsourceAllocationRecord record, Model model) {
         PageInfo pageInfo = new PageInfo(record.getPage(), record.getRows(), record.getSort(), record.getOrder());
+        List<OutsourceCompany> outList = companyMapper.selectAllList();
         Map<String, Object> condition = new HashMap<>();
         // 查询参数
         condition.put("custId", record.getCustId());
         condition.put("ious", record.getIous());
         pageInfo.setCondition(condition);
-        outsourceAllocationRecordService.loadMatchingData(pageInfo);
+        outsourceAllocationRecordService.loadMatchingData(pageInfo, outList);
+        model.addAttribute("outList", outList);
+        model.addAttribute("counts", outList.size());
         return pageInfo;
     }
 
+    /**
+     * 导出所有委外总表数据
+     * @param record
+     * @param request
+     * @param response
+     */
     @PostMapping("/download")
     public void download(OutsourceAllocationRecord record, HttpServletRequest request, HttpServletResponse response) {
         try {
             if (record == null || StringUtils.isBlank(record.getCustId())) {
                 renderError("请填写要导出的客户身份证号!");
             }
+            List<OutsourceCompany> outList = companyMapper.selectAllList();
             Map<String, Object> condition = new HashMap<>();
             // 查询参数
             condition.put("custId", record.getCustId());
             condition.put("ious", record.getIous());
-            List<Map<String, Object>> mapList = outsourceAllocationRecordService.getMatchingData(condition);
-            if (mapList.size() > 0) {
-                // 写入文件数据解析
-                XSSFWorkbook wb = new XSSFWorkbook();
-                XSSFSheet sheet = wb.createSheet("sheet1");
-                XSSFRow row = sheet.createRow(0);
-                row.createCell(0).setCellValue("身份证号");
-                row.createCell(1).setCellValue("已委外过");
-                row.createCell(2).setCellValue("公司1");
-                row.createCell(3).setCellValue("公司2");
-                row.createCell(4).setCellValue("公司3");
-                row.createCell(5).setCellValue("公司4");
-                row.createCell(6).setCellValue("公司5");
-                row.createCell(7).setCellValue("公司6");
-                row.createCell(8).setCellValue("公司7");
-                row.createCell(9).setCellValue("公司8");
-                row.createCell(10).setCellValue("公司9");
-                row.createCell(11).setCellValue("公司10");
-                for (int i = 0; i < mapList.size(); i++) {
-                    row = sheet.createRow(i + 1);
-                    Map map = mapList.get(i);
-                    row.createCell(0).setCellValue((String) map.get("custId"));
-                    row.createCell(1).setCellValue((String) map.get("wg"));
-                    row.createCell(2).setCellValue((String) map.get("ww1"));
-                    row.createCell(3).setCellValue((String) map.get("ww2"));
-                    row.createCell(4).setCellValue((String) map.get("ww3"));
-                    row.createCell(5).setCellValue((String) map.get("ww4"));
-                    row.createCell(6).setCellValue((String) map.get("ww5"));
-                    row.createCell(7).setCellValue((String) map.get("ww6"));
-                    row.createCell(8).setCellValue((String) map.get("ww7"));
-                    row.createCell(9).setCellValue((String) map.get("ww8"));
-                    row.createCell(10).setCellValue((String) map.get("ww9"));
-                    row.createCell(11).setCellValue((String) map.get("ww10"));
-                }
-                String fileName = "已委外公司匹配清单_" + DateUtils.dateToString(new Date(), "yyyyMMdd") + ".xlsx";
-                // 文件下载到浏览器
-                ExcelUtils.writeFileToClient(fileName, wb, request, response);
-            }
+            outsourceAllocationRecordService.getMatchingData(condition, outList, request, response);
         } catch (Exception e) {
             e.printStackTrace();
             renderError("导出文件异常!");
@@ -153,14 +131,14 @@ public class OutsourceAllocationRecordController extends BaseController {
         Long startTime = System.currentTimeMillis();
         if (!file.isEmpty()) {
             // 转换为 File
-            File tempFile = null;
+            File tempFile;
             try {
                 tempFile = FileUtils.multipartToFile(file);
                 // 获取导入文件中的数据
-                List<HashMap<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
+                List<Map<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
                 Map<String, Object> map = outsourceAllocationRecordService.importInOutsourceExcel(listMap);
                 Long endTime = System.currentTimeMillis();
-                System.out.println("文件上传总耗时:" + (endTime-startTime));
+                System.out.println("委外总表文件上传总耗时:" + (endTime-startTime));
                 if (map.get("code").equals("200")) {
                     return renderSuccess(map.get("msg"));
                 } else {
@@ -205,14 +183,14 @@ public class OutsourceAllocationRecordController extends BaseController {
         Long startTime = System.currentTimeMillis();
         if (!file.isEmpty()) {
             // 转换为 File
-            File tempFile = null;
+            File tempFile;
             try {
                 tempFile = FileUtils.multipartToFile(file);
                 // 获取导入文件中的数据
-                List<HashMap<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
+                List<Map<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
                 Map<String, Object> map = outsourceAllocationRecordService.importAmountAndRecordExcel(listMap);
                 Long endTime = System.currentTimeMillis();
-                System.out.println("文件上传总耗时:" + (endTime-startTime));
+                System.out.println("移交文件上传总耗时:" + (endTime-startTime));
                 if (map.get("code").equals("200")) {
                     return renderSuccess(map.get("msg"));
                 } else {

@@ -2,78 +2,209 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.main.mapper.OutsourceAllocationRepaymentMapper">
 
-	<!-- 通用查询映射结果 -->
-	<resultMap id="BaseResultMap" type="com.main.model.OutsourceAllocationRepayment">
-		<id column="id" property="id" />
-		<result column="name" property="name" />
-		<result column="cust_id" property="custId" />
-		<result column="tel_number" property="telNumber" />
-		<result column="ious" property="ious" />
-		<result column="cur_amount" property="curAmount" />
-		<result column="repayment_date" property="repaymentDate" />
-		<result column="transfer" property="transfer" />
-		<result column="hand_over_agecd" property="handOverAgecd" />
-		<result column="hand_over_amount" property="handOverAmount" />
-		<result column="company" property="company" />
-		<result column="creat_date" property="creatDate" />
-		<result column="is_sum_refund" property="isSumRefund" />
-		<result column="remarks" property="remarks" />
-	</resultMap>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.main.model.OutsourceAllocationRepayment">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="cust_id" property="custId"/>
+        <result column="tel_number" property="telNumber"/>
+        <result column="ious" property="ious"/>
+        <result column="cur_amount" property="curAmount"/>
+        <result column="repayment_date" property="repaymentDate"/>
+        <result column="transfer" property="transfer"/>
+        <result column="hand_over_agecd" property="handOverAgecd"/>
+        <result column="hand_over_amount" property="handOverAmount"/>
+        <result column="company" property="company"/>
+        <result column="creat_date" property="creatDate"/>
+        <result column="product_name" property="productName"/>
+        <result column="is_sum_refund" property="isSumRefund"/>
+        <result column="remarks" property="remarks"/>
+    </resultMap>
 
-	<!-- 通用查询结果列 -->
-	<sql id="Base_Column_List">
-		id, name, cust_id AS custId, tel_number AS telNumber, ious, cur_amount AS curAmount, repayment_date AS repaymentDate, transfer, hand_over_agecd AS handOverAgecd, hand_over_amount AS handOverAmount, company,creat_date AS creatDate, is_sum_refund AS isSumRefund, remarks
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+		id, name, cust_id AS custId, tel_number AS telNumber, ious, cur_amount AS curAmount,
+		repayment_date AS repaymentDate, transfer, hand_over_agecd AS handOverAgecd,
+		hand_over_amount AS handOverAmount, company,creat_date AS creatDate, product_name AS productName,
+		is_sum_refund AS isSumRefund, remarks
 	</sql>
 
-	<!-- 分页查询 -->
-	<select id="selectPageInfo" resultType="Map">
-		SELECT
-		<include refid="Base_Column_List"/>
-		FROM OUTSOURCE_ALLOCATION_REPAYMENT
-		<where>
-			1=1
-			<if test="custId != null and custId != ''">
-				AND CUST_ID = #{custId}
-			</if>
-			<if test="ious != null and ious != ''">
-				AND IOUS = #{ious}
-			</if>
-			<if test="company != null and company != ''">
-				AND COMPANY = #{company}
-			</if>
-			<if test="startRepaymentDateTime != null and startRepaymentDateTime != ''">
-				AND REPAYMENT_DATE >= #{startRepaymentDateTime}
-			</if>
-			<if test="endRepaymentDateTime != null and endRepaymentDateTime != ''">
-				AND REPAYMENT_DATE &lt;= #{endRepaymentDateTime}
-			</if>
-		</where>
-	</select>
+    <!-- 分页查询 -->
+    <select id="selectPageInfo" resultType="Map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM OUTSOURCE_ALLOCATION_REPAYMENT
+        <where>
+            1=1
+            <if test="custId != null and custId != ''">
+                AND CUST_ID = #{custId}
+            </if>
+            <if test="ious != null and ious != ''">
+                AND IOUS = #{ious}
+            </if>
+            <if test="company != null and company != ''">
+                AND COMPANY = #{company}
+            </if>
+            <if test="startRepaymentDateTime != null and startRepaymentDateTime != ''">
+                AND REPAYMENT_DATE >= #{startRepaymentDateTime}
+            </if>
+            <if test="endRepaymentDateTime != null and endRepaymentDateTime != ''">
+                AND REPAYMENT_DATE &lt;= #{endRepaymentDateTime}
+            </if>
+        </where>
+    </select>
 
-	<!-- 查询满足条件的所有数据 -->
-	<select id="loadAllRepaymentByMaps" resultType="com.main.model.OutsourceAllocationRepayment">
-		SELECT
-		<include refid="Base_Column_List" />
-		FROM OUTSOURCE_ALLOCATION_REPAYMENT
-		<where>
-			1=1
-			<if test="company != null and company != ''">
-				AND COMPANY = #{company}
-			</if>
-			<if test="startRepaymentDateTime != null and startRepaymentDateTime != ''">
-				AND REPAYMENT_DATE > #{startRepaymentDateTime}
-			</if>
-			<if test="endRepaymentDateTime != null and endRepaymentDateTime != ''">
-				AND REPAYMENT_DATE &lt; #{endRepaymentDateTime}
-			</if>
-		</where>
-	</select>
+    <!-- 查询满足条件的所有数据 -->
+    <select id="loadAllRepaymentByMaps" resultType="com.main.model.OutsourceAllocationRepayment">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM OUTSOURCE_ALLOCATION_REPAYMENT
+        <where>
+            1=1
+            <if test="company != null and company != ''">
+                AND COMPANY = #{company}
+            </if>
+            <if test="startRepaymentDateTime != null and startRepaymentDateTime != ''">
+                AND REPAYMENT_DATE > #{startRepaymentDateTime}
+            </if>
+            <if test="endRepaymentDateTime != null and endRepaymentDateTime != ''">
+                AND REPAYMENT_DATE &lt; #{endRepaymentDateTime}
+            </if>
+        </where>
+    </select>
 
     <!-- 根据ID查询一条 -->
-	<select id="selectById" resultType="com.main.model.OutsourceAllocationRepayment" >
-		SELECT
-		<include refid="Base_Column_List" />
-		FROM OUTSOURCE_ALLOCATION_REPAYMENT WHERE ID = #{id}
-	</select>
+    <select id="selectById" resultType="com.main.model.OutsourceAllocationRepayment">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM OUTSOURCE_ALLOCATION_REPAYMENT WHERE ID = #{id}
+    </select>
+
+    <!-- 还款报表_还款 -->
+    <select id="selectRepaymentRateInfo" resultType="Map">
+        SELECT
+        z.transfer AS transfer, z.hand_over_agecd AS handOverAgeCd, ROUND(SUM(z.hand_over_amount), 2) AS handOverAmount,
+        ROUND(SUM(z.cur_amount), 2) AS curAmount
+        FROM (
+        SELECT
+        r.ious, r.transfer, r.hand_over_agecd, r.hand_over_amount, r.cur_amount
+        FROM (
+        SELECT
+        ious, DATE_FORMAT(transfer, '%Y%m%d') AS transfer, hand_over_agecd,
+        IF ( hand_over_amount > cur_amount, cur_amount, hand_over_amount) hand_over_amount,
+        cur_amount AS cur_amount
+        FROM outsource_allocation_repayment
+        <where>
+            1=1
+            <if test="company != null and company != ''">
+                AND COMPANY = #{company}
+            </if>
+            <if test="agecd != null">
+                AND HAND_OVER_AGECD = #{agecd}
+            </if>
+            <if test="agecds != null">
+                AND HAND_OVER_AGECD >= #{agecds}
+            </if>
+        </where>
+        ) r
+        ) z
+        GROUP BY z.transfer, z.hand_over_agecd;
+    </select>
+    <!-- 还款报表_大总 -->
+    <select id="selectRecordStatementInfo" resultType="Map">
+        SELECT turn_over_day AS turnOverDay,age_cd AS ageCd, Round(SUM(amount_override),2) AS amountOverride
+        FROM OUTSOURCE_ALLOCATION_RECORD
+        <where>
+            1=1
+            <if test="company != null and company != ''">
+                AND DCA_DISTRIBUTION = #{company}
+            </if>
+            <if test="agecd != null">
+                AND AGE_CD = #{agecd}
+            </if>
+            <if test="agecds != null">
+                AND AGE_CD >= #{agecds}
+            </if>
+            <if test="month != null and month != ''">
+                AND TURN_OVER_DAY LIKE #{month}
+            </if>
+            <if test="monthStart != null and monthStart != ''">
+                AND TURN_OVER_DAY >= #{monthStart}
+            </if>
+        </where>
+        GROUP BY turn_over_day, age_cd
+    </select>
+    <!-- 还款效率 -->
+    <select id="selectRepaymentRateCaseNum" resultType="Map">
+        SELECT
+        p.`month` AS month, p.daysum AS daySum, p.hand_over_agecd AS handOverAgecd, SUM(p.cur_amount) AS curAmount
+        FROM ( SELECT
+        hand_over_agecd, cur_amount,
+        DATE_FORMAT(transfer, '%Y%m%m') AS transfer,
+        DATE_FORMAT(repayment_date, '%Y%m%m') AS repayment_date,
+        ( datediff(repayment_date, transfer) + 1) AS daysum,
+        DATE_FORMAT(transfer, '%Y-%m') AS month
+        FROM `OUTSOURCE_ALLOCATION_REPAYMENT`
+        <where>
+            1=1
+            <if test="company != null and company != ''">
+                AND COMPANY = #{company}
+            </if>
+            <if test="agecd != null">
+                AND hand_over_agecd = #{agecd}
+            </if>
+            <if test="agecds != null">
+                AND hand_over_agecd >= #{agecds}
+            </if>
+        </where>
+        ) p
+        <where>
+            1 = 1
+            <if test="month != null and month != ''">
+                AND p.`month` = #{month}
+            </if>
+        </where>
+        GROUP BY p.`month`, p.daysum
+        ORDER BY p.`month`, p.daysum ASC;
+    </select>
+
+    <select id="selectTurnOverRepaymentInfo" resultType="Map">
+        SELECT
+        p.`month` AS month, p.daysum AS daySum, p.hand_over_agecd AS handOverAgecd,
+        ROUND(SUM(p.cur_amount), 2) AS curAmount, ROUND(SUM(p.hand_over_amount), 2) AS handOverAmount
+        FROM ( SELECT
+        hand_over_agecd, cur_amount,
+        DATE_FORMAT(transfer, '%Y%m%m') AS transfer,
+        DATE_FORMAT(repayment_date, '%Y%m%m') AS repayment_date,
+        ( datediff(repayment_date, transfer) + 1) AS daysum,
+        DATE_FORMAT(transfer, '%Y%m%d') AS month,
+        DATE_FORMAT(transfer, '%Y-%m-%d') AS month1,
+        IF (hand_over_amount > cur_amount, cur_amount, hand_over_amount) hand_over_amount
+        FROM `OUTSOURCE_ALLOCATION_REPAYMENT`
+        <where>
+            1=1
+            <if test="company != null and company != ''">
+                AND COMPANY = #{company}
+            </if>
+            <if test="agecd != null">
+                AND hand_over_agecd = #{agecd}
+            </if>
+            <if test="agecds != null">
+                AND hand_over_agecd >= #{agecds}
+            </if>
+        </where>
+        ) p
+        <where>
+            1 = 1
+            <if test="month != null and month != ''">
+                AND p.`month1` LIKE #{month}
+            </if>
+            <if test="monthStart != null and monthStart != ''">
+                AND p.`month1` >= #{monthStart}
+            </if>
+        </where>
+        GROUP BY p.`month`, p.daysum,  p.hand_over_agecd
+        ORDER BY p.`month`, p.daysum ASC
+    </select>
 
 </mapper>

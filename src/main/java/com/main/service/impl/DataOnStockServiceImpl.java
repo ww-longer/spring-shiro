@@ -31,12 +31,12 @@ public class DataOnStockServiceImpl extends ServiceImpl<DataOnStockMapper, DataO
 
     @Override
     @Transactional
-    public void importdataOnStockExcel(List<HashMap<String, Object>> listMap) {
+    public void importdataOnStockExcel(List<Map<String, Object>> listMap) {
         // 1.删除现在表中的所有数据
         dataOnStockMapper.clearAllData();
         // 2.循环写入当前表格数据
         for (int i = 0; i < listMap.size(); i++) {
-            HashMap<String, Object> maps = listMap.get(i);
+            Map<String, Object> maps = listMap.get(i);
             if (maps != null) {
                 DataOnStock onStock = new DataOnStock();
                 onStock.setCustId(maps.get("证件号码").toString());

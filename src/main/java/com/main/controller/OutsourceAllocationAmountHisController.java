@@ -5,7 +5,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import com.main.model.OutsourceAllocationAmountHis;
+import com.main.model.OutsourceCompany;
 import com.main.service.OutsourceAllocationAmountHisService;
+import com.main.service.OutsourceCompanyService;
 import com.sys.commons.base.BaseController;
 import com.sys.commons.result.PageInfo;
 import com.sys.commons.utils.DateUtils;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +39,9 @@ public class OutsourceAllocationAmountHisController extends BaseController {
 
     @Autowired
     private OutsourceAllocationAmountHisService outsourceAllocationAmountHisService;
+
+    @Autowired
+    private OutsourceCompanyService outsourceCompanyService;
     
     @GetMapping("/search")
     public String search() {
@@ -49,6 +55,9 @@ public class OutsourceAllocationAmountHisController extends BaseController {
         pageInfo = new PageInfo(amountHis.getPage(), amountHis.getRows(), amountHis.getSort(), amountHis.getOrder());
         Map<String, Object> amountHisMap = new HashMap<>();
         // 查询参数
+        if (StringUtils.isNotBlank(amountHis.getName())) {
+            amountHisMap.put("name", "%" + amountHis.getName() + "%");
+        }
         amountHisMap.put("custId", amountHis.getCustId());
         amountHisMap.put("ious", amountHis.getIous());
         amountHisMap.put("company", amountHis.getCompany());
@@ -98,25 +107,7 @@ public class OutsourceAllocationAmountHisController extends BaseController {
             renderError("导出文件异常!");
         }
     }
-    
-    /**
-     * 删除
-     * @param id
-     * @return
-     */
-    @PostMapping("/delete")
-    @ResponseBody
-    public Object delete(Long id) {
-        OutsourceAllocationAmountHis outsourceAllocationAmountHis = new OutsourceAllocationAmountHis();
 
-        boolean b = outsourceAllocationAmountHisService.updateById(outsourceAllocationAmountHis);
-        if (b) {
-            return renderSuccess("删除成功！");
-        } else {
-            return renderError("删除失败！");
-        }
-    }
-    
     /**
      * 编辑
      * @param model
@@ -132,7 +123,7 @@ public class OutsourceAllocationAmountHisController extends BaseController {
     
     /**
      * 编辑
-     * @param 
+     * @param
      * @return
      */
     @PostMapping("/edit")
@@ -144,5 +135,26 @@ public class OutsourceAllocationAmountHisController extends BaseController {
         } else {
             return renderError("编辑失败！");
         }
+    }
+
+
+    /**
+     * 直接从历史案件中留案,加载历史案件,返回留案页面
+     *
+     * @param id
+     * @param model
+     * @return
+     */
+    @GetMapping("/updateAmountHisPage")
+    public String updateAmountHisPage(int id, Model model) {
+        OutsourceAllocationAmountHis amountHis = outsourceAllocationAmountHisService.loadAmountHisById(id);
+        if (null != amountHis) {
+            List<OutsourceCompany> companies = outsourceCompanyService.loadAllCompany();
+            model.addAttribute("amountHis", amountHis);
+            model.addAttribute("companies", companies);
+            model.addAttribute("transfer", DateUtils.dateToString(amountHis.getTransfer(), "yyyy-MM-dd HH:mm:ss"));
+            model.addAttribute("thePushDay", DateUtils.dateToString(amountHis.getThePushDay(), "yyyy-MM-dd HH:mm:ss"));
+        }
+        return "sc_main/outsourceAmount/updateAmountHisPage";
     }
 }

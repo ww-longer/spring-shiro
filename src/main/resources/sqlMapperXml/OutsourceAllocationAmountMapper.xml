@@ -22,6 +22,7 @@
         <result column="creat_date" property="creatDate"/>
         <result column="is_leave_case" property="isLeaveCase"/>
         <result column="leave_case_date" property="leaveCaseDate"/>
+        <result column="transfer_amount" property="transferAmount"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -29,7 +30,8 @@
 		id, name, cust_id AS custId, tel_number AS telNumber, ious, now_collection_amount AS nowCollectionAmount,
 		now_agecd AS nowAgecd, transfer_agecd AS transferAgecd, transfer, the_push_day AS thePushDay,
 		last_collection_amount AS lastCollectionAmount, last_agecd AS lastAgecd, update_time AS updateTime,
-		company, remarks, creat_date AS creatDate, is_leave_case AS isLeaveCase, leave_case_date AS leaveCaseDate
+		company, remarks, creat_date AS creatDate, is_leave_case AS isLeaveCase, leave_case_date AS leaveCaseDate,
+		transfer_amount AS transferAmount
 	</sql>
 
     <!-- 分页查询 -->
@@ -39,6 +41,9 @@
         FROM OUTSOURCE_ALLOCATION_AMOUNT
         <where>
             1=1
+            <if test="name != null and name != ''">
+                AND `NAME` LIKE #{name}
+            </if>
             <if test="custId != null and custId != ''">
                 AND CUST_ID = #{custId}
             </if>
@@ -91,13 +96,6 @@
         </if>
     </select>
 
-    <!-- 查询条件的所有数据 -->
-    <select id="loadOutsourceAmountAllLists" resultType="com.main.model.OutsourceAllocationAmount">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM OUTSOURCE_ALLOCATION_AMOUNT GROUP BY CUST_ID
-    </select>
-
     <!-- 删除所有满足条件的数据 -->
     <delete id="deleteOutsourceAmountOverdue">
         DELETE FROM OUTSOURCE_ALLOCATION_AMOUNT
@@ -116,6 +114,9 @@
         FROM OUTSOURCE_ALLOCATION_AMOUNT
         <where>
             1=1
+            <if test="id != null">
+                AND ID = #{id}
+            </if>
             <if test="custId != null and custId != ''">
                 AND CUST_ID = #{custId}
             </if>
@@ -147,11 +148,34 @@
                 AND THE_PUSH_DAY &lt;= #{endThePushDayTime}
             </if>
         </where>
+        <if test="orderStr != null and orderStr != ''">
+            ORDER BY ${orderStr} ${orderAsc}
+        </if>
         <if test="isNotList != null and isNotList != ''">
             LIMIT 1
         </if>
     </select>
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultType="com.main.model.OutsourceAllocationAmount">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM OUTSOURCE_ALLOCATION_AMOUNT WHERE ID = #{id}
+    </select>
 
+    <!-- 查询当前所有再催移交日期 -->
+    <select id="selectAllTransfer" resultType="java.lang.String">
+        SELECT DATE_FORMAT(r.TRANSFER, '%Y%m%d') AS transfer FROM
+        OUTSOURCE_ALLOCATION_AMOUNT r
+        <where>
+            1=1
+            <if test="company != null and company != ''">
+                AND COMPANY = #{company}
+            </if>
+        </where>
+        GROUP BY r.TRANSFER
+    </select>
+
+    <!-- 插入数据并返回ID -->
     <insert id="insertInfo" parameterType="com.main.model.OutsourceAllocationAmount" useGeneratedKeys="true"
             keyProperty="id">
         insert into
@@ -159,7 +183,7 @@
         (
          id, name, cust_id, tel_number, ious, now_collection_amount, now_agecd, transfer_agecd,
          transfer, the_push_day, last_collection_amount, last_agecd, update_time, company, remarks,
-         creat_date, is_leave_case, leave_case_date
+         creat_date, is_leave_case, leave_case_date, transfer_amount
         )
         values
         (
@@ -180,8 +204,30 @@
          #{remarks,jdbcType=VARCHAR},
          #{creatDate,jdbcType=TIMESTAMP},
          #{isLeaveCase,jdbcType=VARCHAR},
-		 #{leaveCaseDate,jdbcType=TIMESTAMP}
+		 #{leaveCaseDate,jdbcType=TIMESTAMP},
+		 #{transferAmount,jdbcType=DOUBLE}
         )
     </insert>
+    <!-- 饼图-公司账龄-总数 -->
+    <select id="searchAllCompanyCaseNum" resultType="Map">
+        SELECT COMPANY AS company, COUNT(1) count, SUM(now_collection_amount) as sum FROM `OUTSOURCE_ALLOCATION_AMOUNT`
+        WHERE 1=1 AND NOW_AGECD &lt;&gt; 0 GROUP BY COMPANY
+    </select>
+    <!-- 饼图-公司账龄-总金额 -->
+    <select id="searchAllCaseAgecdNum" resultType="Map">
+        SELECT COMPANY AS company, NOW_AGECD as agecd, COUNT(1) count, SUM(now_collection_amount) as sum FROM `OUTSOURCE_ALLOCATION_AMOUNT`
+        WHERE 1=1 AND NOW_AGECD &lt;&gt; 0 GROUP BY COMPANY, NOW_AGECD
+    </select>
+
+    <!-- 饼图-账龄公司-总数 -->
+    <select id="searchAllAgecdCompanyCase" resultType="Map">
+        SELECT  NOW_AGECD as agecd, COUNT(1) count, SUM(now_collection_amount) as sum FROM `OUTSOURCE_ALLOCATION_AMOUNT`
+        WHERE 1=1 AND NOW_AGECD &lt;&gt; 0 GROUP BY NOW_AGECD
+    </select>
+    <!-- 饼图-账龄公司-总金额 -->
+    <select id="searchAllAgecdCompanyAmount" resultType="Map">
+        SELECT COMPANY AS company, NOW_AGECD as agecd, COUNT(1) count, SUM(now_collection_amount) as sum FROM `OUTSOURCE_ALLOCATION_AMOUNT`
+        WHERE 1=1 AND NOW_AGECD &lt;&gt; 0 GROUP BY NOW_AGECD, COMPANY
+    </select>
 
 </mapper>

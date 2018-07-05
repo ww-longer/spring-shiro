@@ -58,15 +58,15 @@
         var url = "${path}/sc/collection/refund/dataGrid";
         var columns = [[
             {width: '5%', title: '姓名', field: 'name', sortable: true},
-            {width: '11%', title: '身份证', field: 'custId', sortable: true},
-            {width: '7%', title: '电话', field: 'telNumber', sortable: true},
+            {width: '10%', title: '身份证', field: 'custId', sortable: true},
+            {width: '6%', title: '电话', field: 'telNumber', sortable: true},
             {width: '12%', title: '借据号', field: 'ious', sortable: true},
-            {width: '6%', title: '还款金额', field: 'curAmount', sortable: true},
+            {width: '5%', title: '还款金额', field: 'curAmount', sortable: true},
             {width: '8%', title: '还款日期', field: 'repaymentDate', sortable: true},
             {width: '8%', title: '移交日期', field: 'transfer', sortable: true},
             {width: '4%', title: '移交账龄', field: 'handOverAgecd', sortable: true},
             {width: '4%', title: '移交金额', field: 'handOverAmount', sortable: true},
-            {width: '4%', title: '公司', field: 'company', sortable: true},
+            {width: '3%', title: '公司', field: 'company', sortable: true},
             {
                 width: '4%', title: '还款情况', field: 'isSumRefund', sortable: true,
                 formatter: function (value, row, index) {
@@ -79,11 +79,11 @@
                 }
             },
             {width: '8%', title: '创建时间', field: 'creatDate', sortable: true},
-            {width: '5%', title: '备注', field: 'remarks', sortable: true},
+            {width: '8%', title: '备注', field: 'remarks', sortable: true},
             {
                 field: 'action',
                 title: '操作',
-                width: '4%',
+                width: '5%',
                 formatter: function (value, row, index) {
                     var str = '';
                     str += $.formatString('<a href="javascript:void(0)" class="resource-easyui-linkbutton-edit" ' +

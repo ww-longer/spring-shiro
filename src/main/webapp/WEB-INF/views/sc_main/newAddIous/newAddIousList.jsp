@@ -4,11 +4,12 @@
     <div>
         <table>
             <tr>
-                <td>身份证号:<input class="easyui-textbox" name="naiCustIds" data-options="prompt:'请输入身份证号',validType:''"
+                <td>
+                    身份证号:<input class="easyui-textbox" name="naiCustIds" data-options="prompt:'请输入身份证号',validType:''"
                                 style="width:150px;height:25px"> &nbsp;&nbsp;&nbsp;&nbsp;
                     借据号:<input class="easyui-textbox" name="naiIouss" data-options="prompt:'请输入借据号',validType:''"
                                style="width:150px;height:25px">&nbsp;&nbsp;&nbsp;&nbsp;
-                    公司:<select id="naiCompanys" style="width:120px;height:20px;border-radius: 5px;">
+                    公司:<select id="naiCompanys" style="width:120px;height:25px;border-radius: 5px;">
                         <option value=""></option>
                         <c:forEach items="${companies}" var="item">
                             <option value="${item.company}">${item.company}</option>
@@ -48,7 +49,7 @@
     $(function () {
         naIousId = newAddIousDataGrid();
         caseAddToAmount = $('#batchDisposeId').form({
-            url: '${base}/sc/collection/newAddIous/batchDispose',
+            url: '${path}/sc/collection/newAddIous/batchDispose',
             onSubmit: function () {
                 xz();
                 progressLoad();
@@ -84,6 +85,7 @@
             {width: '15%', title: '借据号', field: 'ious', sortable: true},
             {width: '10%', title: '最新逾期金额', field: 'nowCollectionAmount', sortable: true},
             {width: '10%', title: '最新账龄', field: 'nowAgecd', sortable: true},
+            {width: '10%', title: '最新逾期天数', field: 'overdue', sortable: true},
             {width: '10%', title: '预分配公司', field: 'company', sortable: true},
             {width: '12%', title: '更新时间', field: 'updateTime', sortable: true},
             {width: '12%', title: '创建时间', field: 'creatDate', sortable: true}
@@ -108,8 +110,8 @@
             idField: 'id',
             sortName: 'id',
             sortOrder: 'asc',
-            pageSize: 25,
-            pageList: [25, 50, 100, 200],
+            pageSize: 200,
+            pageList: [50, 100, 200, 500],
             columns: columns,
             queryParams: params
         });

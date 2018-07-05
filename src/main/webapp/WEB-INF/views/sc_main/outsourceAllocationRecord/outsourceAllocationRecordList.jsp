@@ -10,10 +10,13 @@
     <div>
         <table>
             <tr>
-                <td>身份证号:<input class="easyui-textbox" name="custIds" data-options="prompt:'请输入身份证号',validType:''"
-                                style="width:300px;height:25px"> &nbsp;&nbsp;&nbsp;&nbsp;
-                    借据号:<input class="easyui-textbox" name="iouss" data-options="prompt:'请输入借据号',validType:''"
-                               style="width:300px;height:25px"></td>
+                <td>
+                    姓名:<input class="easyui-textbox" name="record_names" data-options="prompt:'请输入姓名',validType:''"
+                                style="width:130px;height:25px"> &nbsp;&nbsp;&nbsp;&nbsp;
+                    身份证号:<input class="easyui-textbox" name="record_custIds" data-options="prompt:'请输入身份证号',validType:''"
+                                style="width:200px;height:25px"> &nbsp;&nbsp;&nbsp;&nbsp;
+                    借据号:<input class="easyui-textbox" name="record_iouss" data-options="prompt:'请输入借据号',validType:''"
+                               style="width:200px;height:25px"></td>
             </tr>
             <tr>
                 <td>
@@ -65,23 +68,24 @@
         var url = "${path}/sc/collection/search";
         var columns = [[
             {width: '6%', title: '姓名', field: 'name', sortable: true},
-            {width: '10%', title: '身份证', field: 'custId', sortable: true},
-            {width: '8%', title: '电话', field: 'telNumber', sortable: true},
-            {width: '10%', title: '借据号', field: 'ious', sortable: true},
+            {width: '11%', title: '身份证', field: 'custId', sortable: true},
+            {width: '6%', title: '电话', field: 'telNumber', sortable: true},
+            {width: '14%', title: '借据号', field: 'ious', sortable: true},
             {width: '5%', title: '分期总金额', field: 'totalAmount', sortable: true},
             {width: '5%', title: '逾期金额', field: 'amountOverride', sortable: true},
             {width: '4%', title: '账龄', field: 'ageCd', sortable: true},
             {width: '4%', title: '逾期天数', field: 'overdue', sortable: true},
-            {width: '5%', title: '网络贷款平台', field: 'netLendingPlatform', sortable: true},
+            {width: '6%', title: '网络贷款平台', field: 'netLendingPlatform', sortable: true},
             {width: '5%', title: '委外公司', field: 'dcaDistribution', sortable: true},
             {width: '5%', title: '案件类型', field: 'theCaseDistribution', sortable: true},
             {width: '6%', title: '移交日期', field: 'turnOverDay', sortable: true},
-            {width: '8%', title: '产品名称', field: 'productName', sortable: true},
+            {width: '6%', title: '产品名称', field: 'productName', sortable: true},
             {width: '8%', title: '描述', field: 'remarks', sortable: true}
         ]];
         var params = {
-            custId: $("input[name='custIds']").val(),
-            ious: $("input[name='iouss']").val()
+            name: $("input[name='record_names']").val(),
+            custId: $("input[name='record_custIds']").val(),
+            ious: $("input[name='record_iouss']").val()
         };
         publicDataGrid(url, columns, params);
     }
@@ -104,8 +108,8 @@
             {width: '7%', title: '公司10', field: 'ww10'}
         ]];
         var params = {
-            custId: $("input[name='custIds']").val(),
-            ious: $("input[name='iouss']").val()
+            custId: $("input[name='record_custIds']").val(),
+            ious: $("input[name='record_iouss']").val()
         };
         publicDataGrid(url, columns, params);
     }
@@ -129,8 +133,8 @@
 
     // 下载导出Excel
     function downloadExcel() {
-        $("#custId").val($("input[name='custIds']").val());
-        $("#ious").val($("input[name='iouss']").val());
+        $("#custId").val($("input[name='record_custIds']").val());
+        $("#ious").val($("input[name='record_iouss']").val());
         $("#downloadFile").submit();
     }
     // 下载导出全部数据

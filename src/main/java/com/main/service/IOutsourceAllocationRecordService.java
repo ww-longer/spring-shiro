@@ -2,11 +2,11 @@ package com.main.service;
 
 import com.main.model.OutsourceAllocationRecord;
 import com.baomidou.mybatisplus.service.IService;
+import com.main.model.OutsourceCompany;
 import com.sys.commons.result.PageInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,13 +22,13 @@ public interface IOutsourceAllocationRecordService extends IService<OutsourceAll
 
     void selectPageInfo(PageInfo pageInfo);
 
-    void loadMatchingData(PageInfo pageInfo);
+    void loadMatchingData(PageInfo pageInfo, List<OutsourceCompany> outList);
 
-    List<Map<String,Object>> getMatchingData(Map<String, Object> condition);
+    void getMatchingData(Map<String, Object> condition, List<OutsourceCompany> outList, HttpServletRequest request, HttpServletResponse response);
 
-    Map<String, Object> importInOutsourceExcel(List<HashMap<String, Object>> listMap);
+    Map<String, Object> importInOutsourceExcel(List<Map<String, Object>> listMap);
 
     void downLoadAllDate(HttpServletRequest request, HttpServletResponse response);
 
-    Map<String,Object> importAmountAndRecordExcel(List<HashMap<String, Object>> listMap);
+    Map<String,Object> importAmountAndRecordExcel(List<Map<String, Object>> listMap);
 }

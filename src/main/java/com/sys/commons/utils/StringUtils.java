@@ -81,7 +81,9 @@ public class StringUtils extends org.springframework.util.StringUtils {
     }
 
     /**
-     * 判断当前字符串是不是数字
+     * 判断当前字符串是不是数值(不包含科学技术)
+     * lr: 0.001,234.23,23231,12342,-23423,-234.234,-0.23
+     * 正数,负数,浮点数,
      * @param str
      * @return
      */

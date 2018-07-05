@@ -82,11 +82,10 @@ public class OutsourceAllocationRepaymentController extends BaseController {
     public Object uploadRepaymentExcel(@RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             // 转换为 File
-            File tempFile = null;
             try {
-                tempFile = FileUtils.multipartToFile(file);
+                File tempFile = FileUtils.multipartToFile(file);
                 // 获取导入文件中的数据
-                List<HashMap<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
+                List<Map<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
                 if (listMap != null && listMap.size() > 0) {
                     outsourceAllocationRepaymentService.importRepaymentHisExcel(listMap);
                     return renderSuccess("文件导入成功！");

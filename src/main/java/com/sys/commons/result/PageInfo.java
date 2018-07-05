@@ -16,7 +16,9 @@ public class PageInfo {
     private final static int PAGESIZE = 10; //默认显示的记录数 
 
     private int total; // 总记录 
-    private List rows; //显示的记录  
+    private List rows; //显示的记录
+
+    private int totalAmount; //显示的记录总金额数
 
     @JsonIgnore
     private int from;
@@ -134,5 +136,13 @@ public class PageInfo {
 
     public void setOrder(String order) {
         this.order = order;
+    }
+
+    public int getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(int totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

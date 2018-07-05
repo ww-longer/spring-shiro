@@ -1,20 +1,21 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ include file="/commons/global.jsp" %>
 <div>
-    <div>
+    <div style="margin: 10px 10px;">
         <table>
             <tr>
-                <td>
+                <td> 姓名:<input class="easyui-textbox" name="amountNames" data-options="prompt:'请输入姓名',validType:''"
+                               style="width:120px;height:25px;"> &nbsp;&nbsp;&nbsp;&nbsp;
                     身份证号:<input class="easyui-textbox" name="amountCustIds" data-options="prompt:'请输入身份证号',validType:''"
                                 style="width:180px;height:25px;"> &nbsp;&nbsp;&nbsp;&nbsp;
                     借据号:<input class="easyui-textbox" name="amountIouss" data-options="prompt:'请输入借据号',validType:''"
                                style="width:180px;height:25px; "> &nbsp;&nbsp;&nbsp;&nbsp;
                     公司:<select id="companys" style="width:120px;height:25px;border-radius: 5px;">
-                            <option value=""></option>
-                            <c:forEach items="${companies}" var="item">
-                                <option value="${item.company}">${item.company}</option>
-                            </c:forEach>
-                        </select>
+                        <option value=""></option>
+                        <c:forEach items="${companies}" var="item">
+                            <option value="${item.company}">${item.company}</option>
+                        </c:forEach>
+                    </select>
                 </td>
             </tr>
             <tr>
@@ -45,19 +46,23 @@
                     </shiro:hasPermission>
                     <shiro:hasPermission name="/sc/collection/outsourceBalance/his/dataGrid">
                         <a href="javascript:void(0)" onclick="outsourceAmountHisDataGrid()" class="easyui-linkbutton"
-                           iconCls="icon-search" style="width:80px;height:25px">历史查询</a> &nbsp;&nbsp;&nbsp;
+                           iconCls="icon-search" style="width:90px;height:25px">历史查询</a> &nbsp;&nbsp;&nbsp;
                     </shiro:hasPermission>
                     <shiro:hasPermission name="/sc/collection/outsourceBalance/his/downloadThePushExp">
                         <a href="javascript:void(0)" onclick="exportThePushExp()" class="easyui-linkbutton"
-                           iconCls="icon-print" style="width:110px;height:25px">导出出催清单</a> &nbsp;&nbsp;&nbsp;
+                           iconCls="icon-print" style="width:120px;height:25px">导出出催清单</a> &nbsp;&nbsp;&nbsp;
                     </shiro:hasPermission>
                     <shiro:hasPermission name="/sc/collection/outsourceBalance/downloadAllAmountExp">
                         <a href="javascript:void(0)" onclick="exportAllAmountExp()" class="easyui-linkbutton"
-                           iconCls="icon-print" style="width:110px;height:25px">导出全量余额</a> &nbsp;&nbsp;&nbsp;
+                           iconCls="icon-print" style="width:120px;height:25px">导出全量余额</a> &nbsp;&nbsp;&nbsp;
+                    </shiro:hasPermission>
+                    <shiro:hasPermission name="/sc/collection/outsourceBalance/downloadAllAmountExp">
+                        <a href="javascript:void(0)" onclick="exportAllLeaveExp()" class="easyui-linkbutton"
+                           iconCls="icon-print" style="width:120px;height:25px">导出留案清单</a> &nbsp;&nbsp;&nbsp;
                     </shiro:hasPermission>
                     <shiro:hasPermission name="/sc/collection/outsourceBalance/addAmountPage">
                         <a href="javascript:void(0)" onclick="addAmountData()" class="easyui-linkbutton"
-                           iconCls="icon-print" style="width:80px;height:25px">添加</a> &nbsp;&nbsp;&nbsp;
+                           iconCls="icon-add" style="width:80px;height:25px">添加</a> &nbsp;&nbsp;&nbsp;
                     </shiro:hasPermission>
 
                 </td>
@@ -78,33 +83,34 @@
         var url = "${path}/sc/collection/outsourceBalance/dataGrid";
         var columns = [[
             {width: '4%', title: '姓名', field: 'name', sortable: true},
-            {width: '10%', title: '身份证', field: 'custId', sortable: true},
-            {width: '6%', title: '电话', field: 'telNumber', sortable: true},
+            {width: '11%', title: '身份证', field: 'custId', sortable: true},
+            //{width: '6%', title: '电话', field: 'telNumber', sortable: true},
             {width: '13%', title: '借据号', field: 'ious', sortable: true},
-            {width: '6%', title: '最新催收金额', field: 'nowCollectionAmount', sortable: true},
+            {width: '6%', title: '最新金额', field: 'nowCollectionAmount', sortable: true},
             {width: '4%', title: '最新账龄', field: 'nowAgecd', sortable: true},
             {width: '4%', title: '移交账龄', field: 'transferAgecd', sortable: true},
-            {width: '5%', title: '移交日期', field: 'transfer', sortable: true, formatter: getTime},
-            {width: '5%', title: '退案日期', field: 'thePushDay', sortable: true, formatter: getTime},
-            {width: '2%', title: '留案', field: 'isLeaveCase', sortable: true},
+            {width: '6%', title: '移交日期', field: 'transfer', sortable: true, formatter: getTime},
+            {width: '6%', title: '退案日期', field: 'thePushDay', sortable: true, formatter: getTime},
+            {width: '3%', title: '留案', field: 'isLeaveCase', sortable: true},
             {width: '4%', title: '公司', field: 'company', sortable: true},
-            {width: '6%', title: '上次催收金额', field: 'lastCollectionAmount', sortable: true},
+            {width: '6%', title: '上次金额', field: 'lastCollectionAmount', sortable: true},
             //{width: '4%', title: '上次账龄', field: 'lastAgecd', sortable: true},
             {width: '6%', title: '更新时间', field: 'updateTime', sortable: true, formatter: getTime},
             {width: '6%', title: '创建时间', field: 'creatDate', sortable: true, formatter: getTime},
-            {width: '4%', title: '备注', field: 'remarks', sortable: true},
+            {width: '8%', title: '备注', field: 'remarks', sortable: true},
             {
                 field: 'action',
                 title: '操作',
                 width: '4%',
                 formatter: function (value, row, index) {
                     var str = '';
-                    str += $.formatString('<a href="javascript:void(0)" class="resource-easyui-linkbutton-edit" data-options="plain:true,iconCls:\'fi-pencil icon-blue\'" onclick="editAmountFun(\'{0}\',\'{1}\');" >修改</a>', row.custId, row.ious);
+                    str += $.formatString('<a href="javascript:void(0)" class="resource-easyui-linkbutton-edit" data-options="plain:true,iconCls:\'fi-pencil icon-blue\'" onclick="editAmountFun(\'{0}\',\'{1}\',\'{2}\');" >修改</a>', row.id, row.custId, row.ious);
                     return str;
                 }
             }
         ]];
         var params = {
+            name: $("input[name='amountNames']").val(),
             custId: $("input[name='amountCustIds']").val(),
             ious: $("input[name='amountIouss']").val(),
             company: $("#companys").val(),
@@ -121,21 +127,32 @@
         var columns = [[
             {width: '4%', title: '姓名', field: 'name', sortable: true},
             {width: '10%', title: '身份证', field: 'custId', sortable: true},
-            {width: '6%', title: '电话', field: 'telNumber', sortable: true},
+            //{width: '6%', title: '电话', field: 'telNumber', sortable: true},
             {width: '12%', title: '借据号', field: 'ious', sortable: true},
-            {width: '6%', title: '最新催收金额', field: 'nowCollectionAmount', sortable: true},
+            {width: '6%', title: '最新金额', field: 'nowCollectionAmount', sortable: true},
             {width: '4%', title: '最新账龄', field: 'nowAgecd', sortable: true},
             {width: '4%', title: '移交账龄', field: 'transferAgecd', sortable: true},
             {width: '8%', title: '移交日期', field: 'transfer', sortable: true},
             {width: '8%', title: '退案日期', field: 'thePushDay', sortable: true},
             {width: '4%', title: '是否留案', field: 'isLeaveCase', sortable: true},
             {width: '4%', title: '公司', field: 'company', sortable: true},
-            {width: '6%', title: '上次催收金额', field: 'lastCollectionAmount', sortable: true},
+            {width: '6%', title: '上次金额', field: 'lastCollectionAmount', sortable: true},
             {width: '4%', title: '上次账龄', field: 'lastAgecd', sortable: true},
             {width: '8%', title: '更新时间', field: 'updateTime', sortable: true},
-            {width: '6%', title: '备注', field: 'remarks', sortable: true}
+            {width: '8%', title: '备注', field: 'remarks', sortable: true},
+            {
+                field: 'action',
+                title: '留案',
+                width: '4%',
+                formatter: function (value, row, index) {
+                    var str = '';
+                    str += $.formatString('<a href="javascript:void(0)" class="his-resource-easyui-linkbutton-edit" data-options="plain:true,iconCls:\'fi-pencil icon-blue\'" onclick="editAmountHisFun(\'{0}\');" >留案</a>', row.id);
+                    return str;
+                }
+            }
         ]];
         var params = {
+            name: $("input[name='amountNames']").val(),
             custId: $("input[name='amountCustIds']").val(),
             ious: $("input[name='amountIouss']").val(),
             company: $("#companys").val(),
@@ -163,6 +180,7 @@
             queryParams: params,
             onLoadSuccess:function(data){
                 $('.resource-easyui-linkbutton-edit').linkbutton({text:'编辑'});
+                $('.his-resource-easyui-linkbutton-edit').linkbutton({text:'留案'});
             }
         });
     }
@@ -174,6 +192,11 @@
     // 导出所有的余额数据
     function exportAllAmountExp() {
         var url = "${path}/sc/collection/outsourceBalance/downloadAllAmountExp?";
+        exporCommontExp(url);
+    }
+
+    function exportAllLeaveExp() {
+        var url = "${path}/sc/collection/outsourceBalance/downloadAllLeaveExp?";
         exporCommontExp(url);
     }
     function exporCommontExp(url) {
@@ -211,17 +234,37 @@
      * 修改退案时间
      * @param custId
      */
-    function editAmountFun(custId, ious) {
+    function editAmountFun(id, custId, ious) {
         parent.$.modalDialog({
             title: '修改退案时间',
             width: 500,
             height: 350,
-            href: '${path }/sc/collection/outsourceBalance/updateAmountPage?custId=' + custId + '&ious=' + ious,
+            href: '${path }/sc/collection/outsourceBalance/updateAmountPage?id='+ id +'&custId=' + custId + '&ious=' + ious,
             buttons: [{
                 text: '确定',
                 handler: function () {
                     parent.$.modalDialog.openner_treeGrid = excelAmountUpload;//因为添加成功之后，需要刷新这个treeGrid，所以先预定义好
                     var f = parent.$.modalDialog.handler.find('#updateAmountForm');
+                    f.submit();
+                }
+            }]
+        });
+    }
+    /**
+     * 从历史案件中直接留案
+     *
+     */
+    function editAmountHisFun(id) {
+        parent.$.modalDialog({
+            title: '留案',
+            width: 500,
+            height: 350,
+            href: '${path }/sc/collection/outsourceBalance/his/updateAmountHisPage?id='+ id ,
+            buttons: [{
+                text: '确定',
+                handler: function () {
+                    parent.$.modalDialog.openner_treeGrid = excelAmountUpload;//因为添加成功之后，需要刷新这个treeGrid，所以先预定义好
+                    var f = parent.$.modalDialog.handler.find('#updateAmountHisForm');
                     f.submit();
                 }
             }]

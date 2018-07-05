@@ -22,6 +22,7 @@
 		<result column="creat_date" property="creatDate"/>
 		<result column="is_leave_case" property="isLeaveCase"/>
 		<result column="leave_case_date" property="leaveCaseDate"/>
+		<result column="transfer_amount" property="transferAmount"/>
 	</resultMap>
 
 	<!-- 通用查询结果列 -->
@@ -29,7 +30,8 @@
 		id, name, cust_id AS custId, tel_number AS telNumber, ious, now_collection_amount AS nowCollectionAmount,
 		now_agecd AS nowAgecd, transfer_agecd AS transferAgecd, transfer, the_push_day AS thePushDay,
 		last_collection_amount AS lastCollectionAmount, last_agecd AS lastAgecd, update_time AS updateTime,
-		company, remarks, creat_date AS creatDate, is_leave_case AS isLeaveCase, leave_case_date AS leaveCaseDate
+		company, remarks, creat_date AS creatDate, is_leave_case AS isLeaveCase, leave_case_date AS leaveCaseDate,
+		transfer_amount AS transferAmount
 	</sql>
 
 	<select id="selectOneById" resultType="com.main.model.OutsourceAllocationAmountHis" parameterType="java.lang.Integer">
@@ -42,6 +44,9 @@
 		FROM OUTSOURCE_ALLOCATION_AMOUNT_HIS
 		<where>
 			1=1
+			<if test="name != null and name != ''">
+				AND `NAME` LIKE #{name}
+			</if>
 			<if test="custId != null and custId != ''">
 				AND CUST_ID = #{custId}
 			</if>
@@ -64,34 +69,6 @@
 				AND THE_PUSH_DAY &lt; #{endThePushDayTime}
 			</if>
 		</where>
-	</select>
-
-	<!-- 查询满足条件的所有数据 -->
-	<select id="loadOutsourceAmountHisByMaps" resultType="com.main.model.OutsourceAllocationAmountHis">
-		SELECT
-		<include refid="Base_Column_List"/>
-		FROM OUTSOURCE_ALLOCATION_AMOUNT_HIS
-		<where>
-			1=1
-			<if test="custId != null and custId != ''">
-				AND CUST_ID = #{custId}
-			</if>
-			<if test="ious != null and ious != ''">
-				AND IOUS = #{ious}
-			</if>
-			<if test="company != null and company != ''">
-				AND COMPANY = #{company}
-			</if>
-			<if test="nowCollectionAmount != null">
-				AND NOW_COLLECTION_AMOUNT > #{nowCollectionAmount}
-			</if>
-			<if test="transfer != null and transfer != ''">
-				AND TRANSFER = #{transfer}
-			</if>
-		</where>
-		<if test="isNotList != null and isNotList != ''">
-			LIMIT 1
-		</if>
 	</select>
 
     <!-- 查询 -->
@@ -125,6 +102,9 @@
 			<if test="endThePushDayTime != null and endThePushDayTime != ''">
 				AND THE_PUSH_DAY &lt;= #{endThePushDayTime}
 			</if>
+			<if test="isLeaveCase != null and isLeaveCase != ''">
+				AND IS_LEAVE_CASE = #{isLeaveCase}
+			</if>
 		</where>
 	</select>
 
@@ -135,7 +115,7 @@
 		(
 		id, `name`, cust_id, tel_number, ious, now_collection_amount, now_agecd, transfer_agecd,
 		transfer, the_push_day, last_collection_amount, last_agecd, update_time, company, remarks,
-		creat_date, is_leave_case, leave_case_date
+		creat_date, is_leave_case, leave_case_date, transfer_amount
 		)
 		values
 		(
@@ -156,7 +136,8 @@
 		#{remarks,jdbcType=VARCHAR},
 		#{creatDate,jdbcType=TIMESTAMP},
 		#{isLeaveCase,jdbcType=VARCHAR},
-		#{leaveCaseDate,jdbcType=TIMESTAMP}
+		#{leaveCaseDate,jdbcType=TIMESTAMP},
+		#{transferAmount,jdbcType=DOUBLE}
 		)
 	</insert>
 

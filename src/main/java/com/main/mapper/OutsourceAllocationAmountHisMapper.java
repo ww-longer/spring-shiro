@@ -20,8 +20,6 @@ public interface OutsourceAllocationAmountHisMapper extends BaseMapper<Outsource
 
     List<Map<String,Object>> selectPageInfo(Page<Map<String, Object>> page, Map<String, Object> condition);
 
-    OutsourceAllocationAmountHis loadOutsourceAmountHisByMaps(Map<String, Object> map);
-
     List<OutsourceAllocationAmountHis> loadAmountHisByMaps(Map<String, Object> condition);
 
     Integer insertInfo(OutsourceAllocationAmountHis amountHis);

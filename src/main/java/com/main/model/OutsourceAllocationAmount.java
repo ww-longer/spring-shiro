@@ -91,6 +91,10 @@ public class OutsourceAllocationAmount extends BaseController {
 	 *	留案日期(操作日期)
 	 */
 	private Date leaveCaseDate;
+	/**
+	 * 移交金额
+	 */
+	private Double transferAmount;
 
 
 	private String startTransferTime;
@@ -232,6 +236,14 @@ public class OutsourceAllocationAmount extends BaseController {
 
 	public void setIsLeaveCase(String isLeaveCase) {
 		this.isLeaveCase = isLeaveCase;
+	}
+
+	public Double getTransferAmount() {
+		return transferAmount;
+	}
+
+	public void setTransferAmount(Double transferAmount) {
+		this.transferAmount = transferAmount;
 	}
 
 	public Date getLeaveCaseDate() {
