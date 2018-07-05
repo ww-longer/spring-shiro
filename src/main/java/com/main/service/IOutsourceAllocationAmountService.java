@@ -2,6 +2,7 @@ package com.main.service;
 
 import com.baomidou.mybatisplus.service.IService;
 import com.main.model.OutsourceAllocationAmount;
+import com.main.model.OutsourceAllocationAmountHis;
 import com.sys.commons.result.PageInfo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,9 +27,15 @@ public interface IOutsourceAllocationAmountService extends IService<OutsourceAll
 
     void exportInAllAmountByMap(Map<String, Object> amountMap, HttpServletRequest request, HttpServletResponse response);
 
-    void updateAmountByCustId(OutsourceAllocationAmount amount);
+    void updateAmountByCustId(OutsourceAllocationAmount amount, String isAllCase);
 
     Map addAmountData(OutsourceAllocationAmount amount);
 
     List<OutsourceAllocationAmount> loadAmountByMaps(Map<String, Object> amountMap);
+
+    void updateAmountHisByCustId(OutsourceAllocationAmountHis amountHis);
+
+    List<Map<String, Object>> loadAllOutCompanyCaseNum();
+
+    void exportInAllLeaveByMap(Map<String, Object> amountMap, HttpServletRequest request, HttpServletResponse response);
 }

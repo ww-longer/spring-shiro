@@ -421,7 +421,7 @@ public class ExcelUtils {
      */
     public static void writeFileToClient(String fileName, Workbook wb, HttpServletRequest request, HttpServletResponse response) {
         try {
-            OutputStream fos = null;
+            OutputStream fos;
             fos = response.getOutputStream();
             String userAgent = request.getHeader("USER-AGENT");
             if (org.apache.commons.lang.StringUtils.contains(userAgent, "Mozilla")) {

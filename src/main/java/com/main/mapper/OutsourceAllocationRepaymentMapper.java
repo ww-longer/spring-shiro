@@ -22,4 +22,8 @@ public interface OutsourceAllocationRepaymentMapper extends BaseMapper<Outsource
     List<OutsourceAllocationRepayment> loadAllRepaymentByMaps(Map<String, Object> objectMap);
 
     OutsourceAllocationRepayment selectById(Long id);
+
+    List<Map<String,Object>> selectRepaymentRateInfo(Map<String, Object> condition);
+
+    List<Map<String,Object>> selectRecordStatementInfo(Map<String, Object> condition);
 }

@@ -19,32 +19,32 @@ import com.sys.commons.base.BaseController;
 @TableName("new_add_ious")
 public class NewAddIous extends BaseController {
 
-    /**
-     * 表ID
-     */
+	/**
+	 * 表ID
+	 */
 	@TableId(value="id", type= IdType.AUTO)
 	private Integer id;
-    /**
-     * 身份证号
-     */
+	/**
+	 * 身份证号
+	 */
 	@TableField("cust_id")
 	private String custId;
-    /**
-     * 借据号
-     */
+	/**
+	 * 借据号
+	 */
 	private String ious;
-    /**
-     * 最新催收金额
-     */
+	/**
+	 * 最新催收金额
+	 */
 	@TableField("now_collection_amount")
 	private Double nowCollectionAmount;
-    /**
-     * 最新账龄
-     */
+	/**
+	 * 最新账龄
+	 */
 	@TableField("now_agecd")
 	private Integer nowAgecd;
 	/**
-	 * company 公司
+	 * 公司预分配
 	 */
 	private String company;
 	/**
@@ -54,23 +54,60 @@ public class NewAddIous extends BaseController {
 	/**
 	 * 网络借贷平台
 	 */
+	@TableField("net_lending_platform")
 	private String netLendingPlatform;
 	/**
 	 * 产品名称
 	 */
+	@TableField("product_name")
 	private String productName;
-    /**
-     * 逾期本金
-     */
+	/**
+	 * 逾期欠款本金
+	 */
+	@TableField("overdue_principal")
 	private Double overduePrincipal;
-    /**
-     * 最近更新时间或创建时间
-     */
+	/**
+	 * 分期总金额(当前余额本金)
+	 */
+	@TableField("total_amount")
+	private Double totalAmount;
+	/**
+	 * 下一还款日(还款日)
+	 */
+	@TableField("next_refund_day")
+	private String nextRefundDay;
+	/**
+	 * 逾期利息(逾期欠款利息)
+	 */
+	@TableField("overdue_accrual")
+	private Double overdueAccrual;
+	/**
+	 * 罚息(逾期欠款费用(罚息))
+	 */
+	@TableField("default_interest")
+	private Double defaultInterest;
+	/**
+	 * 是否独资(出资比例)
+	 */
+	@TableField("is_sole_proprietorship")
+	private String isSoleProprietorship;
+	/**
+	 * 合同生成日期
+	 */
+	@TableField("contract_create_date")
+	private String contractCreateDate;
+	/**
+	 * 总分期数(分期数)
+	 */
+	private Integer totalAging;
+	/**
+	 * 最近更新时间或创建时间
+	 */
 	@TableField("update_time")
 	private Date updateTime;
-    /**
-     * 创建时间
-     */
+	/**
+	 * 创建时间
+	 */
 	@TableField("creat_date")
 	private Date creatDate;
 
@@ -147,15 +184,71 @@ public class NewAddIous extends BaseController {
 		this.productName = productName;
 	}
 
-    public Double getOverduePrincipal() {
-        return overduePrincipal;
-    }
+	public Double getOverduePrincipal() {
+		return overduePrincipal;
+	}
 
-    public void setOverduePrincipal(Double overduePrincipal) {
-        this.overduePrincipal = overduePrincipal;
-    }
+	public void setOverduePrincipal(Double overduePrincipal) {
+		this.overduePrincipal = overduePrincipal;
+	}
 
-    public Date getUpdateTime() {
+	public Double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(Double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+
+	public String getNextRefundDay() {
+		return nextRefundDay;
+	}
+
+	public void setNextRefundDay(String nextRefundDay) {
+		this.nextRefundDay = nextRefundDay;
+	}
+
+	public Double getOverdueAccrual() {
+		return overdueAccrual;
+	}
+
+	public void setOverdueAccrual(Double overdueAccrual) {
+		this.overdueAccrual = overdueAccrual;
+	}
+
+	public Double getDefaultInterest() {
+		return defaultInterest;
+	}
+
+	public void setDefaultInterest(Double defaultInterest) {
+		this.defaultInterest = defaultInterest;
+	}
+
+	public String getIsSoleProprietorship() {
+		return isSoleProprietorship;
+	}
+
+	public void setIsSoleProprietorship(String isSoleProprietorship) {
+		this.isSoleProprietorship = isSoleProprietorship;
+	}
+
+	public String getContractCreateDate() {
+		return contractCreateDate;
+	}
+
+	public void setContractCreateDate(String contractCreateDate) {
+		this.contractCreateDate = contractCreateDate;
+	}
+
+	public Integer getTotalAging() {
+		return totalAging;
+	}
+
+	public void setTotalAging(Integer totalAging) {
+		this.totalAging = totalAging;
+	}
+
+	public Date getUpdateTime() {
 		return updateTime;
 	}
 

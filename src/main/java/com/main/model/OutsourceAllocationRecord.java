@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotations.TableName;
 import com.sys.commons.base.BaseController;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -125,6 +126,14 @@ public class OutsourceAllocationRecord extends BaseController {
      * 备注
      */
 	private String remarks;
+	/**
+	 *  创建时间
+	 */
+	private Date createDate;
+    /**
+     * 创爱类型
+     */
+	private String createType;
 
 
 	public Integer getId() {
@@ -307,4 +316,27 @@ public class OutsourceAllocationRecord extends BaseController {
 		return this.id;
 	}
 
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+    public String getCreateType() {
+        return createType;
+    }
+
+    public void setCreateType(String createType) {
+        this.createType = createType;
+    }
+
+    public static void main(String [] d){
+        if ("zhzhehs这是怎么_SYS".indexOf("SYS") >= 0) {
+            System.out.print("有");
+        }else{
+            System.out.print("没有");
+        }
+    }
 }

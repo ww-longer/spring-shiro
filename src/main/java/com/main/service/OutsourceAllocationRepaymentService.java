@@ -29,4 +29,10 @@ public interface OutsourceAllocationRepaymentService extends IService<OutsourceA
     OutsourceAllocationRepayment loadRepaymentById(Integer id);
 
     void importRepaymentHisExcel(List<HashMap<String, Object>> listMap);
+
+    void selectRepaymentRatePageInfo(PageInfo pageInfo);
+
+    void exportInRepaymentReportByMap(Map<String, Object> objectMap, HttpServletRequest request, HttpServletResponse response);
+
+    void exportCompanyRankingExp(HttpServletRequest request, HttpServletResponse response);
 }

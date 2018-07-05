@@ -26,15 +26,23 @@
 		<result column="total_aging" property="totalAging" />
 		<result column="contract_create_date" property="contractCreateDate" />
 		<result column="remarks" property="remarks" />
+		<result column="create_date" property="createDate" />
+		<result column="create_type" property="createType" />
 	</resultMap>
 
 	<!-- 通用查询结果列 -->
 	<sql id="Base_Column_List">
-		id, name, cust_id AS custId, tel_number AS telNumber, ious, total_amount AS totalAmount, next_refund_day AS nextRefundDay, amount_override AS amountOverride, overdue_principal AS overduePrincipal, overdue_accrual AS overdueAccrual, default_interest AS defaultInterest, age_cd AS ageCd, overdue, net_lending_platform AS netLendingPlatform, is_sole_proprietorship AS isSoleProprietorship, dca_distribution AS dcaDistribution, the_case_distribution AS theCaseDistribution, turn_over_day AS turnOverDay, product_name AS productName, total_aging AS totalAging, contract_create_date AS contractCreateDate, remarks
+		id, name, cust_id AS custId, tel_number AS telNumber, ious, total_amount AS totalAmount,
+		next_refund_day AS nextRefundDay, amount_override AS amountOverride, overdue_principal AS overduePrincipal,
+		overdue_accrual AS overdueAccrual, default_interest AS defaultInterest, age_cd AS ageCd, overdue,
+		net_lending_platform AS netLendingPlatform, is_sole_proprietorship AS isSoleProprietorship,
+		dca_distribution AS dcaDistribution, the_case_distribution AS theCaseDistribution,
+		turn_over_day AS turnOverDay, product_name AS productName, total_aging AS totalAging,
+		contract_create_date AS contractCreateDate, remarks, create_date AS createDate, create_type AS createType
 	</sql>
 
 	<!-- 查询所有数据 -->
-	<select id="selectAllList" resultType="Map">
+	<select id="selectAllList" resultType="com.main.model.OutsourceAllocationRecord">
 		SELECT <include refid="Base_Column_List"/> FROM OUTSOURCE_ALLOCATION_RECORD
 	</select>
 
@@ -57,6 +65,9 @@
 		FROM OUTSOURCE_ALLOCATION_RECORD
 		<where>
 			1=1
+			<if test="name != null and name != ''">
+				AND `NAME` LIKE #{name}
+			</if>
 			<if test="custId != null and custId != ''">
 				AND cust_id = #{custId}
 			</if>
@@ -73,6 +84,9 @@
 			1=1
 			<if test="custId != null and custId != ''">
 				AND cust_id = #{custId}
+			</if>
+			<if test="custIds != null and custIds != ''">
+				AND cust_id in (${custIds})
 			</if>
 			<if test="ious != null and ious != ''">
 				AND ious = #{ious}

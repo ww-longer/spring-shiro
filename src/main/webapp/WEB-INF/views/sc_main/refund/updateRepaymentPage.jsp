@@ -44,7 +44,7 @@
                 <td>
                     <span class="input">
                         <input type="text" name="repaymentDate" placeholder="还款日期"
-                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd 00:00:00'})"
                                style="width:200px;height:20px;border-radius: 5px;"
                                value="<fmt:formatDate value="${repayment.repaymentDate}" type="both"></fmt:formatDate>"/>
                     </span>

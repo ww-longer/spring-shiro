@@ -69,8 +69,8 @@ public class NewAddIousServiceImpl extends ServiceImpl<NewAddIousMapper, NewAddI
         List<NewAddIous> newAddIouses = newAddIousMapper.loadNewAddIousByMaps(objectMap);
         for (int i = 0; i < newAddIouses.size(); i++) {
             NewAddIous addIous = newAddIouses.get(i);
-            Date transfer = null, transferjs = null, maxDate = null,date = new Date();
-            int jsAgced = 0;
+            Date transfer, thePushDayjs = null, maxDate = null, date = new Date(), fmtDate = DateUtils.strToDate(DateUtils.dateToString(date, "yyyy-MM-dd"), "yyyy-MM-dd");
+            int jsAgced;
             boolean isAdd = false;
             // 1.更具当前身份证号查询当前客户的所有余额表数据
             objectMap = new HashMap<>();
@@ -83,7 +83,7 @@ public class NewAddIousServiceImpl extends ServiceImpl<NewAddIousMapper, NewAddI
             objectMap.put("ious", addIous.getIous());
             objectMap.put("orderStr", "TURN_OVER_DAY");
             objectMap.put("orderAsc", "DESC");
-            List<OutsourceAllocationRecord> recordList =  outsourceAllocationRecordMapper.loadRecordByMaps(objectMap);
+            List<OutsourceAllocationRecord> recordList;
             // 余额表有当前客户借据再催
             OutsourceAllocationAmount thisAmount = null , custAmount = null, amount1;
             for (int j = 0; null != amountList && j < amountList.size(); j++) {
@@ -96,6 +96,9 @@ public class NewAddIousServiceImpl extends ServiceImpl<NewAddIousMapper, NewAddI
                     custAmount = amount1;
                     if (maxDate == null || DateUtils.differentDaysByMillisecond(maxDate, amount1.getTransfer()) > 0) {
                         maxDate = amount1.getTransfer();
+                    }
+                    if (thePushDayjs == null || DateUtils.differentDaysByMillisecond(thePushDayjs, amount1.getThePushDay()) > 0) {
+                        thePushDayjs = amount1.getThePushDay();
                     }
                 }
             }
@@ -121,7 +124,7 @@ public class NewAddIousServiceImpl extends ServiceImpl<NewAddIousMapper, NewAddI
                          * 没有金额的,新建
                          */
                         isAdd = true;
-                        transfer = date;
+                        transfer = fmtDate;
                         jsAgced = addIous.getNowAgecd();
                     }else{
                         /**
@@ -153,7 +156,7 @@ public class NewAddIousServiceImpl extends ServiceImpl<NewAddIousMapper, NewAddI
                          * 存在的新建
                          */
                         isAdd = true;
-                        transfer = date;
+                        transfer = fmtDate;
                         jsAgced = addIous.getNowAgecd();
                     }else{
                         /**
@@ -172,7 +175,7 @@ public class NewAddIousServiceImpl extends ServiceImpl<NewAddIousMapper, NewAddI
                  * 没有客户的直接添加
                  */
                 isAdd = true;
-                transfer = date;
+                transfer = fmtDate;
                 jsAgced = addIous.getNowAgecd();
             }
 
@@ -181,6 +184,19 @@ public class NewAddIousServiceImpl extends ServiceImpl<NewAddIousMapper, NewAddI
                 thePushDay = DateUtils.getSomeMouthDay(transfer, 1, 0);
             } else {
                 thePushDay = DateUtils.getSomeMouthDay(transfer, 2, 0);
+            }
+            // 取最大退案日
+            if (DateUtils.differentDaysByMillisecond(thePushDay, thePushDayjs) > 0) {
+                thePushDay = thePushDayjs;
+            }
+            // 同步退案日期
+            for (int j = 0; null != amountList && j < amountList.size(); j++) {
+                amount1 = amountList.get(j);
+                if (!"Y".equals(amount1.getIsLeaveCase()) && amount1.getNowCollectionAmount() > 0) {
+                    amount1.setThePushDay(thePushDay);
+                    amount1.setUpdateTime(date);
+                    outsourceAllocationAmountMapper.updateById(amount1);
+                }
             }
             // 判断大总表数据是否为空
             if (null == thisRecord) {
@@ -202,8 +218,9 @@ public class NewAddIousServiceImpl extends ServiceImpl<NewAddIousMapper, NewAddI
             amountHis.setTransfer(transfer);
             amountHis.setThePushDay(thePushDay);
             amountHis.setCompany(thisRecord.getDcaDistribution());
+            amountHis.setTransferAmount(addIous.getOverduePrincipal());
             amountHis.setCreatDate(date);
-            amountHis.setRemarks("SYS_" + DateUtils.dateToString(date, "yyyy-MM-dd"));
+            amountHis.setRemarks("SYS_" + DateUtils.dateToString(date, "yyyy-MM-dd") + "_新增");
             outsourceAllocationAmountHisMapper.insertInfo(amountHis);
 
             // 添加到余额表
@@ -219,8 +236,9 @@ public class NewAddIousServiceImpl extends ServiceImpl<NewAddIousMapper, NewAddI
             amount.setTransfer(transfer);
             amount.setThePushDay(thePushDay);
             amount.setCompany(thisRecord.getDcaDistribution());
+            amount.setTransferAmount(addIous.getOverduePrincipal());
             amount.setCreatDate(date);
-            amount.setRemarks("SYS_" + DateUtils.dateToString(date, "yyyy-MM-dd"));
+            amount.setRemarks("SYS_" + DateUtils.dateToString(date, "yyyy-MM-dd") + "_新增");
             outsourceAllocationAmountMapper.insertInfo(amount);
 
             if (isAdd) {
@@ -230,23 +248,25 @@ public class NewAddIousServiceImpl extends ServiceImpl<NewAddIousMapper, NewAddI
                 allocationRecord.setCustId(addIous.getCustId());
                 allocationRecord.setTelNumber(thisRecord.getTelNumber());
                 allocationRecord.setIous(addIous.getIous());
-                allocationRecord.setTotalAmount("");
-                allocationRecord.setNextRefundDay("");
+                allocationRecord.setTotalAmount(addIous.getTotalAmount() + "");
+                allocationRecord.setNextRefundDay(addIous.getNextRefundDay());
                 allocationRecord.setAmountOverride(addIous.getNowCollectionAmount() + "");
                 allocationRecord.setOverduePrincipal(addIous.getOverduePrincipal() + "");
-                allocationRecord.setOverdueAccrual("");
-                allocationRecord.setDefaultInterest("");
+                allocationRecord.setOverdueAccrual(addIous.getOverdueAccrual() + "");
+                allocationRecord.setDefaultInterest(addIous.getDefaultInterest() + "");
                 allocationRecord.setAgeCd(addIous.getNowAgecd() + "");
                 allocationRecord.setOverdue(addIous.getOverdue() + "");
-                allocationRecord.setNetLendingPlatform(addIous.getNetLendingPlatform() + "");
-                allocationRecord.setIsSoleProprietorship("");
+                allocationRecord.setNetLendingPlatform(addIous.getNetLendingPlatform());
+                allocationRecord.setIsSoleProprietorship(addIous.getIsSoleProprietorship());
                 allocationRecord.setDcaDistribution(thisRecord.getDcaDistribution() + "");
                 allocationRecord.setTheCaseDistribution("M" + addIous.getNowAgecd() +"案件");
                 allocationRecord.setTurnOverDay(DateUtils.dateToString(transfer, "yyyyMMdd") + "");
-                allocationRecord.setProductName(addIous.getProductName() + "");
-                allocationRecord.setTotalAging("");
-                allocationRecord.setContractCreateDate("");
-                allocationRecord.setRemarks("SYS_" + DateUtils.dateToString(date, "yyyy-MM-dd HH:mm:ss"));
+                allocationRecord.setProductName(addIous.getProductName());
+                allocationRecord.setTotalAging(addIous.getTotalAging() + "");
+                allocationRecord.setContractCreateDate(addIous.getContractCreateDate());
+                allocationRecord.setRemarks("SYS_" + DateUtils.dateToString(date, "yyyy-MM-dd HH:mm:ss") + "_新增");
+                allocationRecord.setCreateDate(date);
+                allocationRecord.setCreateType("新增_" + DateUtils.dateToString(date, "yyyy-MM-dd"));
                 outsourceAllocationRecordMapper.insert(allocationRecord);
             }
 

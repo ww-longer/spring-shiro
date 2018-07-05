@@ -74,6 +74,10 @@ public class OutsourceAllocationRepayment extends BaseEntity {
 	 */
 	private Date creatDate;
 	/**
+	 * 产品名称
+	 */
+	private String productName;
+	/**
 	 * 是否全额还款(0-全额,1-部分)
 	 */
 	private Integer isSumRefund;
@@ -180,6 +184,14 @@ public class OutsourceAllocationRepayment extends BaseEntity {
 
 	public void setCreatDate(Date creatDate) {
 		this.creatDate = creatDate;
+	}
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
 
 	public Integer getIsSumRefund() {

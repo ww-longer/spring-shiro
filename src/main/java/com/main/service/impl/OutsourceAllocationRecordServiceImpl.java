@@ -10,19 +10,21 @@ import com.main.service.IOutsourceAllocationRecordService;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.main.service.NewAddIousService;
 import com.sys.commons.result.PageInfo;
-import com.sys.commons.utils.ExcelUtils;
-import com.sys.commons.utils.DateUtils;
-import com.sys.commons.utils.StringUtils;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import com.sys.commons.utils.*;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.*;
 
 /**
@@ -47,6 +49,9 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
     @Autowired
     private NewAddIousService newAddIousService;
 
+    @Value("${filePath}")
+    public String filePath;
+
     @Override
     public void selectPageInfo(PageInfo pageInfo) {
         Page<Map<String, Object>> page = new Page<>(pageInfo.getNowpage(), pageInfo.getSize());
@@ -61,32 +66,74 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
      * 委外过的公司匹配
      *
      * @param pageInfo
+     * @param outList
      */
     @Override
-    public void loadMatchingData(PageInfo pageInfo) {
+    public void loadMatchingData(PageInfo pageInfo, List<OutsourceCompany> outList) {
+        Page<Map<String, Object>> page = new Page<>(pageInfo.getNowpage(), pageInfo.getSize());
         // 解析前端传入custId
         String custIdStr = pageInfo.getCondition().get("custId") + "";
         custIdStr = custIdStr.replace("，", ",").replace("|", ",").replace("\t", ",").replace(" ", ",")
                 .replace(";", ",").replace("/", ",").replace("\n", ",").replace("\r", ",");
         String[] custIds = custIdStr.split(",");
-        List<Map<String, Object>> mapList = dataMatching(custIds);
+        List<Map<String, Object>> mapLists = dataMatching(custIds, outList), mapList = new ArrayList<>();
+        // 逻辑分页
+        int start = (page.getCurrent() - 1) * page.getSize(), end = page.getCurrent() * page.getSize();
+        if (start >= mapLists.size()) {
+            start = (mapLists.size() / page.getSize()) * page.getSize();
+            end = mapLists.size();
+        }
+        if (end > mapLists.size()) end = mapLists.size();
+        for (int i = start; i < end; i++) {
+            Map<String, Object> map = mapLists.get(i);
+            mapList.add(map);
+        }
         pageInfo.setRows(mapList);
-        pageInfo.setTotal(mapList.size());
+        pageInfo.setTotal(mapLists.size());
     }
 
     /**
      * 加载导出匹配数据信息
      *
      * @param condition
-     * @return
+     * @param outList
+     * @param request
+     *@param response @return
      */
     @Override
-    public List<Map<String, Object>> getMatchingData(Map<String, Object> condition) {
+    public void getMatchingData(Map<String, Object> condition, List<OutsourceCompany> outList, HttpServletRequest request, HttpServletResponse response) {
         String custIdStr = condition.get("custId") + "";
         custIdStr = custIdStr.replace("，", ",").replace("|", ",").replace("\t", ",").replace(" ", ",")
                 .replace(";", ",").replace("/", ",").replace("\n", ",").replace("\r", ",");
         String[] custIds = custIdStr.split(",");
-        return dataMatching(custIds);
+        List<Map<String, Object>> mapList = dataMatching(custIds, outList);
+        if (mapList.size() > 0) {
+            // 写入文件数据解析
+            XSSFWorkbook wb = new XSSFWorkbook();
+            XSSFSheet sheet = wb.createSheet("sheet1");
+            XSSFRow row = sheet.createRow(0);
+            row.createCell(0).setCellValue("身份证号");
+            row.createCell(1).setCellValue("已委外过");
+            for (int i = 0; i < 10; i++) {
+                if (i < outList.size()) {
+                    row.createCell(i + 2).setCellValue(outList.get(i).getCompany());
+                } else {
+                    row.createCell(i + 2).setCellValue("公司" + (i + 1));
+                }
+            }
+            for (int i = 0; i < mapList.size(); i++) {
+                row = sheet.createRow(i + 1);
+                Map map = mapList.get(i);
+                row.createCell(0).setCellValue((String) map.get("custId"));
+                row.createCell(1).setCellValue((String) map.get("wg"));
+                for (int j = 0; j < 10; j++) {
+                    row.createCell(j + 2).setCellValue((String) map.get("ww" + (j + 1)));
+                }
+            }
+            String fileName = "已委外公司匹配清单_" + DateUtils.dateToString(new Date(), "yyyyMMdd") + ".xlsx";
+            // 文件下载到浏览器
+            ExcelUtils.writeFileToClient(fileName, wb, request, response);
+        }
     }
 
     /**
@@ -95,24 +142,48 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
      * @param custIds
      * @return
      */
-    public List<Map<String, Object>> dataMatching(String[] custIds) {
+    private List<Map<String, Object>> dataMatching(String[] custIds, List<OutsourceCompany> outList) {
         // 创建封装对象集合
         List<Map<String, Object>> mapList = new ArrayList<>();
         // 获取全部外包公司
-        List<OutsourceCompany> outList = companyMapper.selectAllList();
         List<String> outs = new ArrayList<>();
         for (int i = 0; i < outList.size(); i++) {
             OutsourceCompany objectMap = outList.get(i);
             outs.add(objectMap.getCompany());
         }
+        // 查询所有的要查询的借据
+        StringBuilder buffer = new StringBuilder();
         for (int j = 0; j < custIds.length; j++) {
-            Map<String, Object> map = new HashMap<>();
+            if (j == custIds.length - 1) {
+                buffer.append("'").append(custIds[j]).append("'");
+            } else {
+                buffer.append("'").append(custIds[j]).append("',");
+            }
+        }
+        Map<String, Object> mapObj = new HashMap<>(), map;
+        Map<String, List<OutsourceAllocationRecord>> mapLists = new HashMap<>();
+        mapObj.put("custIds", buffer.toString());
+        List<OutsourceAllocationRecord> allLists = outsourceAllocationRecordMapper.loadRecordByMaps(mapObj);
+        // 循环组装(map(custId, List<借据>))
+        for (int i = 0; i < allLists.size(); i++) {
+            OutsourceAllocationRecord record = allLists.get(i);
+            List<OutsourceAllocationRecord> lists = mapLists.get(record.getCustId());
+            if (null == lists) {
+                lists = new ArrayList<>();
+            }
+            lists.add(record);
+            mapLists.put(record.getCustId(), lists);
+        }
+
+        for (int j = 0; j < custIds.length && allLists.size() > 0; j++) {
+            map = new HashMap<>();
             map.put("custId", custIds[j]);
             // 创建一个存储当前查询客户的所有委外过的公司
             Set<String> setStr = new HashSet<>();
             // 根据传入custId 查询委外记录数据
-            List<OutsourceAllocationRecord> lists = outsourceAllocationRecordMapper.loadRecordByMaps(map);
-            for (int i = 0; i < lists.size(); i++) {
+            List<OutsourceAllocationRecord> lists = mapLists.get(custIds[j]);
+            //List<OutsourceAllocationRecord> lists = outsourceAllocationRecordMapper.loadRecordByMaps(map);
+            for (int i = 0; lists != null && i < lists.size(); i++) {
                 OutsourceAllocationRecord objectMap = lists.get(i);
                 // 包含于所有外包公司之中
                 String existStr = objectMap.getDcaDistribution();
@@ -123,15 +194,15 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
                     }
                 }
             }
-            String wgStr = "";
+            StringBuilder wgStr = new StringBuilder();
             int s = 0;
             if (setStr.size() > 0) {
                 for (String str : setStr) {
                     s++;
                     if (s == setStr.size()) {
-                        wgStr += str;
+                        wgStr.insert(0, str);
                     } else {
-                        wgStr += str + ",";
+                        wgStr.insert(0,"," + str);
                     }
                     for (int i = 0, m = 1; i < outs.size(); i++, m++) {
                         if (str.equals(outs.get(i))) {
@@ -149,7 +220,7 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
                     map.put("ww" + m, outs.get(i));
                 }
             }
-            map.put("wg", wgStr);
+            map.put("wg", wgStr.toString());
             mapList.add(map);
         }
         return mapList;
@@ -190,6 +261,7 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
             String totalAging = map.get("分期总期数") == null ? "": map.get("分期总期数").toString();
             String contractCreateDate = map.get("合同生成日期") == null ? "" : map.get("合同生成日期").toString();
             String remarks = map.get("备注") == null ? "" : map.get("备注").toString();
+            String createType = map.get("类型") == null ? "" : map.get("类型").toString();
             if (name.indexOf("VLOOKUP") >= 0 || custId.indexOf("VLOOKUP") >= 0 ||
                     telNumber.indexOf("VLOOKUP") >= 0 || ious.indexOf("VLOOKUP") >= 0 ||
                     totalAmount.indexOf("VLOOKUP") >= 0 || nextRefundDay.indexOf("VLOOKUP") >= 0 ||
@@ -228,6 +300,8 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
                 record.setTotalAging(totalAging);
                 record.setContractCreateDate(contractCreateDate);
                 record.setRemarks(remarks);
+                record.setCreateDate(new Date());
+                record.setCreateType(createType);
                 outsourceAllocationRecordMapper.insert(record);
             }
         }
@@ -244,7 +318,45 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
     @Override
     public void downLoadAllDate(HttpServletRequest request, HttpServletResponse response) {
         // 查询所有表数据
-        List<Map<String, Object>> allList = outsourceAllocationRecordMapper.selectAllList();
+        List<OutsourceAllocationRecord> allList = outsourceAllocationRecordMapper.selectAllList();
+        String path = filePath + File.separator + "Record";
+        printAllRecordInfo(allList, path + File.separator + DateUtils.dateToString(new Date(), "yyyyMMdd"), "全部");
+        Map<String, List<OutsourceAllocationRecord>> recordListMap = new HashMap<>();
+        // 获取每个公司下的还款
+        for (int i = 0; i < allList.size(); i++) {
+            OutsourceAllocationRecord record = allList.get(i);
+            // 获取到当前公司下的所有数据集合,如果为空,
+            List<OutsourceAllocationRecord> records = recordListMap.get(record.getDcaDistribution());
+            if (records == null) {
+                records = new ArrayList<>();
+            }
+            records.add(record);
+            recordListMap.put(record.getDcaDistribution(), records);
+        }
+        // 遍历所有公司
+        List<OutsourceCompany> companyList = companyMapper.selectAllList();
+        for (int i = 0; i < companyList.size(); i++) {
+            OutsourceCompany company = companyList.get(i);
+            List<OutsourceAllocationRecord> recordList = recordListMap.get(company.getCompany());
+            printAllRecordInfo(recordList, path + File.separator + DateUtils.dateToString(new Date(), "yyyyMMdd"), company.getCompany());
+        }
+        // 压缩文件
+        FileOutputStream fos;
+        String zipPath = new File(path + File.separator + DateUtils.dateToString(new Date(), "yyyyMMdd")).toString();
+        String zipName =  "委外大总表_" + DateUtils.dateToString(new Date(), "yyyyMMdd") + ".zip";
+        try {
+            fos = new FileOutputStream(path + File.separator + zipName);
+            ZipUtils.toZip(zipPath, fos, true);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        // 下载文件到浏览器
+        FileUtils.printFileToLocal(path, zipName, request, response);
+        // 删除目录下文件
+        FileUtils.delAllFile(path);
+    }
+
+    private void printAllRecordInfo(List<OutsourceAllocationRecord> lists, String path, String fileName) {
         // 写入文件数据解析
         Workbook wb = new XSSFWorkbook();
         Sheet sheet = wb.createSheet("sheet1");
@@ -270,43 +382,124 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
         row.createCell(18).setCellValue("分期总期数");
         row.createCell(19).setCellValue("合同生成日期");
         row.createCell(20).setCellValue("备注");
+        row.createCell(21).setCellValue("类型");
         // 写出所有表数据
-        for (int i = 0; i < allList.size(); i++) {
+        for (int i = 0; i < lists.size(); i++) {
             row = sheet.createRow(i + 1);
-            Map map = allList.get(i);
-            if (map != null) {
-                row.createCell(0).setCellValue(map.get("name").toString());
-                row.createCell(1).setCellValue(map.get("custId").toString());
-                row.createCell(2).setCellValue(map.get("telNumber").toString());
-                row.createCell(3).setCellValue(map.get("ious").toString());
-                row.createCell(4).setCellValue(map.get("totalAmount").toString());
-                row.createCell(5).setCellValue(map.get("nextRefundDay").toString());
-                row.createCell(6).setCellValue(map.get("amountOverride").toString());
-                row.createCell(7).setCellValue(map.get("overduePrincipal").toString());
-                row.createCell(8).setCellValue(map.get("overdueAccrual").toString());
-                row.createCell(9).setCellValue(map.get("defaultInterest").toString());
-                row.createCell(10).setCellValue(map.get("ageCd").toString());
-                row.createCell(11).setCellValue(map.get("overdue").toString());
-                row.createCell(12).setCellValue(map.get("netLendingPlatform").toString());
-                row.createCell(13).setCellValue(map.get("isSoleProprietorship").toString());
-                row.createCell(14).setCellValue(map.get("dcaDistribution").toString());
-                row.createCell(15).setCellValue(map.get("theCaseDistribution").toString());
-                row.createCell(16).setCellValue(map.get("turnOverDay").toString());
-                row.createCell(17).setCellValue(map.get("productName").toString());
-                row.createCell(18).setCellValue(map.get("totalAging").toString());
-                row.createCell(19).setCellValue(map.get("contractCreateDate").toString());
-                row.createCell(20).setCellValue(map.get("remarks").toString());
+            OutsourceAllocationRecord record = lists.get(i);
+            if (record != null) {
+                if (StringUtils.isNotBlank(record.getCreateType()) &&
+                        record.getCreateType().indexOf(DateUtils.dateToString(new Date(), "yyyy-MM-dd")) >= 0) {
+                    CellStyle cellStyle = wb.createCellStyle();
+                    if (record.getCreateType().indexOf("新增") >= 0) {
+                        cellStyle.setFillForegroundColor(IndexedColors.ORANGE.getIndex());
+                        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                    }else{
+                        cellStyle.setFillForegroundColor(IndexedColors.YELLOW1.getIndex());
+                        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                    }
+                    Cell cell = row.createCell(0);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getName());
+                    cell = row.createCell(1);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getCustId());
+                    cell = row.createCell(2);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getTelNumber());
+                    cell = row.createCell(3);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getIous());
+                    cell = row.createCell(4);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getTotalAmount());
+                    cell = row.createCell(5);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getNextRefundDay());
+                    cell = row.createCell(6);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getAmountOverride());
+                    cell = row.createCell(7);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getOverduePrincipal());
+                    cell = row.createCell(8);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getOverdueAccrual());
+                    cell = row.createCell(9);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getDefaultInterest());
+                    cell = row.createCell(10);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getAgeCd());
+                    cell = row.createCell(11);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getOverdue());
+                    cell = row.createCell(12);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getNetLendingPlatform());
+                    cell = row.createCell(13);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getIsSoleProprietorship());
+                    cell = row.createCell(14);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getDcaDistribution());
+                    cell = row.createCell(15);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getTheCaseDistribution());
+                    cell = row.createCell(16);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getTurnOverDay());
+                    cell = row.createCell(17);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getProductName());
+                    cell = row.createCell(18);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getTotalAging());
+                    cell = row.createCell(19);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getContractCreateDate());
+                    cell = row.createCell(20);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getRemarks());
+                    cell = row.createCell(21);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(record.getCreateType());
+                }else{
+                    row.createCell(0).setCellValue(record.getName());
+                    row.createCell(1).setCellValue(record.getCustId());
+                    row.createCell(2).setCellValue(record.getTelNumber());
+                    row.createCell(3).setCellValue(record.getIous());
+                    row.createCell(4).setCellValue(record.getTotalAmount());
+                    row.createCell(5).setCellValue(record.getNextRefundDay());
+                    row.createCell(6).setCellValue(record.getAmountOverride());
+                    row.createCell(7).setCellValue(record.getOverduePrincipal());
+                    row.createCell(8).setCellValue(record.getOverdueAccrual());
+                    row.createCell(9).setCellValue(record.getDefaultInterest());
+                    row.createCell(10).setCellValue(record.getAgeCd());
+                    row.createCell(11).setCellValue(record.getOverdue());
+                    row.createCell(12).setCellValue(record.getNetLendingPlatform());
+                    row.createCell(13).setCellValue(record.getIsSoleProprietorship());
+                    row.createCell(14).setCellValue(record.getDcaDistribution());
+                    row.createCell(15).setCellValue(record.getTheCaseDistribution());
+                    row.createCell(16).setCellValue(record.getTurnOverDay());
+                    row.createCell(17).setCellValue(record.getProductName());
+                    row.createCell(18).setCellValue(record.getTotalAging());
+                    row.createCell(19).setCellValue(record.getContractCreateDate());
+                    row.createCell(20).setCellValue(record.getRemarks());
+                    row.createCell(21).setCellValue(record.getCreateType());
+                }
             }
         }
-        String fileName = "委外大总表_" + DateUtils.dateToString(new Date(), "yyyyMMdd") + ".xlsx";
-        // 文件下载到浏览器
-        ExcelUtils.writeFileToClient(fileName, wb, request, response);
+        String name = fileName + "_" + DateUtils.dateToString(new Date(), "yyyyMMdd") + ".xlsx";
+        // 输出 Excel 文件到本地磁盘
+        ExcelUtils.printExcelFileToLocal(path, name, wb);
     }
+
 
     @Override
     public Map<String, Object> importAmountAndRecordExcel(List<HashMap<String, Object>> listMap) {
-        Date date = new Date(), transfer, thePushDay;
-        Map<String, Object> resultMap = new HashMap<>();
+        Date date = new Date(), transfer, thePushDay, maxThePushDay = null;
+        Map<String, Object> resultMap = new HashMap<>(), objectMap;
         // 2.写入当前读取到的Excel表格中数据
         for (int i = 0; i < listMap.size(); i++) {
             Map map = listMap.get(i);
@@ -360,7 +553,59 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
                 }else{
                     thePushDay = DateUtils.getSomeMouthDay(transfer, 2, 0);
                 }
+                // 查询当前客户的所有借据
+                objectMap = new HashMap<>();
+                objectMap.put("custId", custId);
+                // 查询当前客户在余额表是否有借据存在,根据不同情况进行移交日和出催日的计算
+                List<OutsourceAllocationAmount> amountList = outsourceAllocationAmountMapper.loadCommonAmountByMaps(objectMap);
+                OutsourceAllocationAmount amount1;
+                // 清空最大退案日
+                if (null == amountList || amountList.size() <= 0) {
+                    maxThePushDay = null;
+                }
+                for (int j = 0; null != amountList && j < amountList.size(); j++) {
+                    amount1 = amountList.get(j);
+                    // 判断是否有金额大于0的当前借据
+                    /**
+                     * 为防止错误数据查产生,如果在发生移交借据移交时余额表中还存在有金额大于零的借据时,把余额表中的当前借据删除,且修改当前
+                     * 历史表中的数据,
+                     */
+                    if (ious.equals(amount1.getIous()) && amount1.getNowCollectionAmount() > 0) {
+                        objectMap = new HashMap<>();
+                        objectMap.put("id", amount1.getId());
+                        outsourceAllocationAmountMapper.deleteByMap(objectMap);
+                        // 更新历史表数据
+                        OutsourceAllocationAmountHis amountHis = outsourceAllocationAmountHisMapper.selectOneById(amount1.getId());
+                        amountHis.setThePushDay(date);
+                        amountHis.setUpdateTime(date);
+                        outsourceAllocationAmountHisMapper.updateById(amountHis);
+                    }
+                    // 获取当前客户最迟退案日(排除当前借据和金额为零的)
+                    if (amount1.getNowCollectionAmount() > 0 && !ious.equals(amount1.getIous())) {
+                        if (maxThePushDay == null || DateUtils.differentDaysByMillisecond(maxThePushDay, amount1.getThePushDay()) > 0) {
+                            maxThePushDay = amount1.getThePushDay();
+                        }
+                    }
+                }
+                // 取最大退案日
+                if (DateUtils.differentDaysByMillisecond(thePushDay, maxThePushDay) > 0) {
+                    thePushDay = maxThePushDay;
+                }
+                // 同步退案日期
+                for (int j = 0; null != amountList && j < amountList.size(); j++) {
+                    amount1 = amountList.get(j);
+                    if (!"Y".equals(amount1.getIsLeaveCase()) && amount1.getNowCollectionAmount() > 0) {
+                        amount1.setThePushDay(thePushDay);
+                        amount1.setUpdateTime(date);
+                        outsourceAllocationAmountMapper.updateById(amount1);
 
+                        // 历史表同步
+                        OutsourceAllocationAmountHis amountHis = outsourceAllocationAmountHisMapper.selectOneById(amount1.getId());
+                        amountHis.setThePushDay(thePushDay);
+                        amountHis.setUpdateTime(date);
+                        outsourceAllocationAmountHisMapper.updateById(amountHis);
+                    }
+                }
                 // 添加到余额历史表
                 OutsourceAllocationAmountHis amountHis = new OutsourceAllocationAmountHis();
                 amountHis.setName(name);
@@ -375,7 +620,8 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
                 amountHis.setCompany(dcaDistribution);
                 amountHis.setUpdateTime(date);
                 amountHis.setCreatDate(date);
-                amountHis.setRemarks(remarks);
+                amountHis.setTransferAmount(nowCollectionAmount);
+                amountHis.setRemarks(remarks + DateUtils.dateToString(date, "yyyy-MM-dd") + "_移交");
                 outsourceAllocationAmountHisMapper.insertInfo(amountHis);
 
                 // 添加到余额表
@@ -393,7 +639,8 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
                 amount.setCompany(dcaDistribution);
                 amount.setUpdateTime(date);
                 amount.setCreatDate(date);
-                amount.setRemarks(remarks);
+                amount.setTransferAmount(nowCollectionAmount);
+                amount.setRemarks(remarks + DateUtils.dateToString(date, "yyyy-MM-dd") + "_移交");
                 outsourceAllocationAmountMapper.insertInfo(amount);
 
                 // 添加到大总表
@@ -418,11 +665,13 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
                 record.setProductName(productName);
                 record.setTotalAging(totalAging);
                 record.setContractCreateDate(contractCreateDate);
-                record.setRemarks(remarks);
+                record.setRemarks(remarks + DateUtils.dateToString(date, "yyyy-MM-dd") + "_移交");
+                record.setCreateDate(date);
+                record.setCreateType("移交_" + DateUtils.dateToString(date, "yyyy-MM-dd"));
                 outsourceAllocationRecordMapper.insert(record);
 
                 // 从新借据表中剔除移交案件
-                Map<String, Object> objectMap = new HashMap<>();
+                objectMap = new HashMap<>();
                 objectMap.put("ious", ious);
                 newAddIousService.deleteByMap(objectMap);
                 // 更新客户公司

@@ -20,6 +20,8 @@ public interface OutsourceAllocationAmountMapper extends BaseMapper<OutsourceAll
 
     Integer insertInfo(OutsourceAllocationAmount amount);
 
+    OutsourceAllocationAmount selectById(int id);
+
     List<Map<String,Object>> selectPageInfo(Page<Map<String, Object>> page, Map<String, Object> condition);
 
     List<OutsourceAllocationAmount> loadOutsourceAmountByMaps(Map<String, Object> map);
@@ -29,4 +31,8 @@ public interface OutsourceAllocationAmountMapper extends BaseMapper<OutsourceAll
     List<OutsourceAllocationAmount> loadOutsourceAmountAllLists();
 
     List<OutsourceAllocationAmount> loadCommonAmountByMaps(Map<String, Object> map);
+
+    List<String> selectAllTransfer(Map<String, Object> objectMap);
+
+    List<Map<String,Object>> searchAllCompanyCaseNum();
 }

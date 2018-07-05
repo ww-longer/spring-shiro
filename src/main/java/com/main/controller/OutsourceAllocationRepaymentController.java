@@ -10,6 +10,7 @@ import com.sys.commons.base.BaseController;
 import com.sys.commons.result.PageInfo;
 import com.sys.commons.utils.ExcelUtils;
 import com.sys.commons.utils.FileUtils;
+import com.sys.commons.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,9 +85,8 @@ public class OutsourceAllocationRepaymentController extends BaseController {
     public Object uploadRepaymentExcel(@RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             // 转换为 File
-            File tempFile = null;
             try {
-                tempFile = FileUtils.multipartToFile(file);
+                File tempFile = FileUtils.multipartToFile(file);
                 // 获取导入文件中的数据
                 List<HashMap<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
                 if (listMap != null && listMap.size() > 0) {

@@ -14,15 +14,24 @@
 		<result column="net_lending_platform" property="netLendingPlatform" />
 		<result column="product_name" property="productName" />
 		<result column="overdue_principal" property="overduePrincipal" />
+		<result column="total_amount" property="totalAmount" />
+		<result column="next_refund_day" property="nextRefundDay" />
+		<result column="overdue_accrual" property="overdueAccrual" />
+		<result column="default_interest" property="defaultInterest" />
+		<result column="is_sole_proprietorship" property="isSoleProprietorship" />
+		<result column="contract_create_date" property="contractCreateDate" />
 		<result column="update_time" property="updateTime" />
 		<result column="creat_date" property="creatDate" />
 	</resultMap>
 
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
         id, cust_id AS custId, ious, now_collection_amount AS nowCollectionAmount, now_agecd AS nowAgecd,
         company, overdue, net_lending_platform AS netLendingPlatform, product_name AS productName,
-        overdue_principal AS overduePrincipal, update_time AS updateTime, creat_date AS creatDate
+        overdue_principal AS overduePrincipal, total_amount AS totalAmount, next_refund_day AS nextRefundDay,
+        overdue_accrual AS overdueAccrual, default_interest AS defaultInterest,
+        is_sole_proprietorship AS isSoleProprietorship, contract_create_date AS contractCreateDate,
+        total_aging AS totalAging, update_time AS updateTime, creat_date AS creatDate
     </sql>
 
 	<!-- 查询所有数据 -->

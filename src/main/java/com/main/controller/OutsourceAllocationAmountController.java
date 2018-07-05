@@ -2,13 +2,11 @@ package com.main.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 import com.main.model.OutsourceAllocationAmount;
 import com.main.model.OutsourceAllocationAmountHis;
 import com.main.model.OutsourceCompany;
 import com.main.service.IOutsourceAllocationAmountService;
-import com.main.service.OutsourceAllocationAmountHisService;
 import com.main.service.OutsourceCompanyService;
 import com.sys.commons.base.BaseController;
 import com.sys.commons.result.PageInfo;
@@ -31,7 +29,7 @@ import java.util.Map;
 
 /**
  * <p>
- *  前端控制器 委外历史余额
+ * 前端控制器 委外历史余额
  * </p>
  *
  * @author jiewai
@@ -47,9 +45,6 @@ public class OutsourceAllocationAmountController extends BaseController {
     @Autowired
     private OutsourceCompanyService outsourceCompanyService;
 
-    @Autowired
-    private OutsourceAllocationAmountHisService outsourceAllocationAmountHisService;
-
     @GetMapping("/search")
     public String search(Model model) {
         model.addAttribute("companies", outsourceCompanyService.loadAllCompany());
@@ -63,6 +58,9 @@ public class OutsourceAllocationAmountController extends BaseController {
         pageInfo = new PageInfo(amount.getPage(), amount.getRows(), amount.getSort(), amount.getOrder());
         Map<String, Object> amountMap = new HashMap<>();
         // 创建查询参数
+        if (StringUtils.isNotBlank(amount.getName())) {
+            amountMap.put("name", "%" + amount.getName() + "%");
+        }
         amountMap.put("custId", amount.getCustId());
         amountMap.put("ious", amount.getIous());
         amountMap.put("company", amount.getCompany());
@@ -88,12 +86,12 @@ public class OutsourceAllocationAmountController extends BaseController {
 
 
     /**
-     *  加载更新页面
+     * 加载更新页面
      */
     @GetMapping("/updateAmountPage")
-    public String updateAmountPage(@RequestParam("custId") String custId, String ious, Model model) {
+    public String updateAmountPage(@RequestParam("custId") String custId, String ious, int id, Model model) {
         Map<String, Object> objectMap = new HashMap<>();
-        objectMap.put("custId", custId);
+        objectMap.put("id", id);
         List<OutsourceAllocationAmount> amounts = outsourceAllocationAmountService.loadAmountByMaps(objectMap);
         if (null != amounts && amounts.size() > 0) {
             List<OutsourceCompany> companies = outsourceCompanyService.loadAllCompany();
@@ -106,8 +104,11 @@ public class OutsourceAllocationAmountController extends BaseController {
         return "sc_main/outsourceAmount/updateAmountPage";
     }
 
+
+
     /**
      * 添加页面加载
+     *
      * @return
      */
     @GetMapping("/addAmountPage")
@@ -118,6 +119,7 @@ public class OutsourceAllocationAmountController extends BaseController {
 
     /**
      * 余额表数据导入更新
+     *
      * @param file
      * @return
      */
@@ -127,20 +129,20 @@ public class OutsourceAllocationAmountController extends BaseController {
         Long startTime = System.currentTimeMillis();
         if (!file.isEmpty()) {
             // 转换为 File
-            File tempFile = null;
+            File tempFile;
             try {
                 tempFile = FileUtils.multipartToFile(file);
                 // 获取导入文件中的数据
                 List<HashMap<String, Object>> listMap = ExcelUtils.loadAllExcelData(tempFile);
                 outsourceAllocationAmountService.importInOutsourceAmountExcel(listMap);
                 Long endTime = System.currentTimeMillis();
-                System.out.println("余额文件上传更新总耗时:" + (endTime-startTime));
+                System.out.println("余额文件上传更新总耗时:" + (endTime - startTime));
                 return renderSuccess("数据更新完成！");
             } catch (IOException e) {
                 e.printStackTrace();
                 return renderError("文件读取失败！");
             }
-        }else{
+        } else {
             return renderError("文件不存在！");
         }
     }
@@ -148,12 +150,13 @@ public class OutsourceAllocationAmountController extends BaseController {
 
     /**
      * 修改退案日期
+     *
      * @param amount
      * @return
      */
     @PostMapping("/updateAmountByCustId")
     @ResponseBody
-    public Object updateAmountByCustId(OutsourceAllocationAmount amount) {
+    public Object updateAmountByCustId(OutsourceAllocationAmount amount, String isAllCase) {
         if (null == amount.getThePushDay() || "".equals(amount.getThePushDay())) {
             return renderError("请输入正确的留案时间！");
         }
@@ -163,12 +166,29 @@ public class OutsourceAllocationAmountController extends BaseController {
         if (null == amount.getCustId() || "".equals(amount.getCustId())) {
             return renderError("数据异常,请重新登陆！");
         }
-        outsourceAllocationAmountService.updateAmountByCustId(amount);
+        outsourceAllocationAmountService.updateAmountByCustId(amount, isAllCase);
+        return renderSuccess("数据更新完成！");
+    }
+
+    @PostMapping("/updateAmountHisByCustId")
+    @ResponseBody
+    public Object updateAmountHisByCustId(OutsourceAllocationAmountHis amountHis) {
+        if (null == amountHis.getThePushDay() || "".equals(amountHis.getThePushDay())) {
+            return renderError("请输入正确的留案时间！");
+        }
+        if (null == amountHis.getTransfer() || "".equals(amountHis.getTransfer())) {
+            return renderError("请输入正确的移交时间！");
+        }
+        if (null == amountHis.getId() || "".equals(amountHis.getId())) {
+            return renderError("数据异常,请重新登陆！");
+        }
+        outsourceAllocationAmountService.updateAmountHisByCustId(amountHis);
         return renderSuccess("数据更新完成！");
     }
 
     /**
      * 导出全量余额数据
+     *
      * @param amount
      * @param request
      * @param response
@@ -185,6 +205,26 @@ public class OutsourceAllocationAmountController extends BaseController {
         amountMap.put("endThePushDayTime", amount.getEndThePushDayTime());
 
         outsourceAllocationAmountService.exportInAllAmountByMap(amountMap, request, response);
+    }
+
+    /**
+     * 导出留案清单
+     * @param amount
+     * @param request
+     * @param response
+     */
+    @GetMapping("/downloadAllLeaveExp")
+    @ResponseBody
+    public void downloadAllLeaveExp(OutsourceAllocationAmount amount, HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> amountMap = new HashMap<>();
+        // 创建查询参数
+        amountMap.put("company", amount.getCompany());
+        amountMap.put("startTransferTime", amount.getStartTransferTime());
+        amountMap.put("endTransfertTime", amount.getEndTransferTime());
+        amountMap.put("startThePushDayTime", amount.getStartThePushDayTime());
+        amountMap.put("endThePushDayTime", amount.getEndThePushDayTime());
+        amountMap.put("isLeaveCase", "Y");
+        outsourceAllocationAmountService.exportInAllLeaveByMap(amountMap, request, response);
     }
 
     @PostMapping("/addAmount")
