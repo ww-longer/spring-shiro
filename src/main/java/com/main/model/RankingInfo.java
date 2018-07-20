@@ -1,6 +1,7 @@
 package com.main.model;
 
 /**
+<<<<<<< HEAD
  * Created by
  * jiewai on 2018/7/2.
  */
@@ -21,6 +22,15 @@ public class RankingInfo implements Comparable<RankingInfo>{
     /**
      * 排名
      */
+=======
+ * Created by jiewai on 2018/7/2.
+ */
+public class RankingInfo implements Comparable<RankingInfo>{
+
+    private String transfer;
+    private String company;
+    private Double rate;
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
     private int ranking;
 
     public String getTransfer() {

@@ -26,8 +26,11 @@ public interface OutsourceAllocationRepaymentMapper extends BaseMapper<Outsource
     List<Map<String,Object>> selectRepaymentRateInfo(Map<String, Object> condition);
 
     List<Map<String,Object>> selectRecordStatementInfo(Map<String, Object> condition);
+<<<<<<< HEAD
 
     List<Map<String,Object>> selectRepaymentRateCaseNum(Map<String, Object> condition);
 
     List<Map<String,Object>> selectTurnOverRepaymentInfo(Map<String, Object> condition);
+=======
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
 }

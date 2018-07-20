@@ -60,6 +60,10 @@
                         <a href="javascript:void(0)" onclick="exportAllLeaveExp()" class="easyui-linkbutton"
                            iconCls="icon-print" style="width:120px;height:25px">导出留案清单</a> &nbsp;&nbsp;&nbsp;
                     </shiro:hasPermission>
+                    <shiro:hasPermission name="/sc/collection/outsourceBalance/downloadAllAmountExp">
+                        <a href="javascript:void(0)" onclick="exportAllLeaveExp()" class="easyui-linkbutton"
+                           iconCls="icon-print" style="width:110px;height:25px">导出留案清单</a> &nbsp;&nbsp;&nbsp;
+                    </shiro:hasPermission>
                     <shiro:hasPermission name="/sc/collection/outsourceBalance/addAmountPage">
                         <a href="javascript:void(0)" onclick="addAmountData()" class="easyui-linkbutton"
                            iconCls="icon-add" style="width:80px;height:25px">添加</a> &nbsp;&nbsp;&nbsp;

@@ -497,7 +497,11 @@ public class OutsourceAllocationRecordServiceImpl extends ServiceImpl<OutsourceA
 
 
     @Override
+<<<<<<< HEAD
     public Map<String, Object> importAmountAndRecordExcel(List<Map<String, Object>> listMap) {
+=======
+    public Map<String, Object> importAmountAndRecordExcel(List<HashMap<String, Object>> listMap) {
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
         Date date = new Date(), transfer, thePushDay, maxThePushDay = null;
         Map<String, Object> resultMap = new HashMap<>(), objectMap;
         // 2.写入当前读取到的Excel表格中数据

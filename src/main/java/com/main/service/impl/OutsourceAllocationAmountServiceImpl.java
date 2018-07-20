@@ -60,10 +60,20 @@ public class OutsourceAllocationAmountServiceImpl extends ServiceImpl<OutsourceA
      */
     @Override
     @Transactional
+<<<<<<< HEAD
     public void importInOutsourceAmountExcel(List<Map<String, Object>> listMaps) {
         long date1 = System.currentTimeMillis();
         // 0.初始操作,确认新增借据
         List<Map<String, Object>> listMap = new ArrayList<>();
+=======
+    public void importInOutsourceAmountExcel(List<HashMap<String, Object>> listMaps) {
+        long date1 = System.currentTimeMillis();
+        // 0.初始操作,确认新增借据
+        List<HashMap<String, Object>> listMap = new ArrayList<>();
+        initNewIous(listMap, listMaps);
+        long date2 = System.currentTimeMillis();
+        System.out.println("初始操作用时:" + (date2-date1));
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
         // 1.删除已经到期的委外退崔数据
         // deleteOutsourceAmountOverdue();
         // 2.更新当前上传的数据
@@ -71,9 +81,14 @@ public class OutsourceAllocationAmountServiceImpl extends ServiceImpl<OutsourceA
         map.put("nowCollectionAmount", 0);
         Map<String, List<OutsourceAllocationAmount>> amountListMaps = new HashMap<>(), amountCustListMaps = new HashMap<>();
         List<OutsourceAllocationAmount> amountLists = outsourceAllocationAmountMapper.loadOutsourceAmountByMaps(map);
+<<<<<<< HEAD
         List<String> strings = new ArrayList<>();
         long date2 = System.currentTimeMillis();
         System.out.println("初始数据查询用时:" + (date2-date1));
+=======
+        long date3 = System.currentTimeMillis();
+        System.out.println("大于0 的余额数据查询用时:" + (date3-date2));
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
         for (int i = 0; i < amountLists.size(); i++) {
             OutsourceAllocationAmount amount = amountLists.get(i);
             List<OutsourceAllocationAmount> amountList = amountListMaps.get(amount.getIous());
@@ -82,11 +97,17 @@ public class OutsourceAllocationAmountServiceImpl extends ServiceImpl<OutsourceA
             }
             amountList.add(amount);
             amountListMaps.put(amount.getIous(), amountList);
+<<<<<<< HEAD
             strings.add(amount.getIous());
         }
         initNewIous(listMap, listMaps, strings);
         long date4 = System.currentTimeMillis();
         System.out.println("大于0 的余额数据组装用时:" + (date4-date2));
+=======
+        }
+        long date4 = System.currentTimeMillis();
+        System.out.println("大于0 的余额数据组装用时:" + (date4-date3));
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
         // 创建一个存储当前查询客户的所有委外过的公司
         Set<String> setStr = new HashSet<>(), custSet = new HashSet<>();
         Date date = new Date();
@@ -407,7 +428,11 @@ public class OutsourceAllocationAmountServiceImpl extends ServiceImpl<OutsourceA
         // 定义一个存放当天借据ious的list
         List<String> iouss = new ArrayList<>();
         for (int i = 0; i < listMaps.size(); i++) {
+<<<<<<< HEAD
             Map<String, Object> map = listMaps.get(i);
+=======
+            HashMap<String, Object> map = listMaps.get(i);
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
             String nowCollectionAmountStr = map.get("最新逾期欠款金额") == null ? "" : map.get("最新逾期欠款金额").toString();
             String nowAgecdStr = map.get("最新账龄") == null ? "" : map.get("最新账龄").toString();
             String custId = map.get("证件号码") == null ? "" : map.get("证件号码").toString();
@@ -560,7 +585,11 @@ public class OutsourceAllocationAmountServiceImpl extends ServiceImpl<OutsourceA
         objectMap.put("custId", allocationAmount.getCustId());
         // 空的时候只修改当前借据
         if (StringUtils.isBlank(isAllCase)) {
+<<<<<<< HEAD
             objectMap.put("id", allocationAmount.getId());
+=======
+            objectMap.put("ious", allocationAmount.getIous());
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
         }
         List<OutsourceAllocationAmount> amountLists = outsourceAllocationAmountMapper.loadCommonAmountByMaps(objectMap);
         for (int i = 0; i < amountLists.size(); i++) {
@@ -597,7 +626,14 @@ public class OutsourceAllocationAmountServiceImpl extends ServiceImpl<OutsourceA
 
     @Override
     public Map addAmountData(OutsourceAllocationAmount amount) {
+<<<<<<< HEAD
         Map<String, Object> map = new HashMap<>(), maps = new HashMap<>();;
+=======
+        Map<String, String> maps = new HashMap<>();
+        Map<String, Object> map;
+        // 查询大总表
+        map = new HashMap<>();
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
         map.put("custId", amount.getCustId());
         map.put("ious", amount.getIous());
         List<OutsourceAllocationRecord> mapList = outsourceAllocationRecordMapper.loadRecordByMaps(map);
@@ -809,6 +845,7 @@ public class OutsourceAllocationAmountServiceImpl extends ServiceImpl<OutsourceA
 
     }
 
+<<<<<<< HEAD
     @Override
     public List<Map<String, Object>> loadAllOutCaseAgecdNum() {
         return outsourceAllocationAmountMapper.searchAllCaseAgecdNum();
@@ -824,6 +861,8 @@ public class OutsourceAllocationAmountServiceImpl extends ServiceImpl<OutsourceA
         return outsourceAllocationAmountMapper.searchAllAgecdCompanyAmount();
     }
 
+=======
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
     private void printAllAmountExp(String sheetName, List<OutsourceAllocationAmount> amountList, Workbook wb) {
         Sheet sheet = wb.createSheet(sheetName);
         CellStyle cellStyle = wb.createCellStyle();

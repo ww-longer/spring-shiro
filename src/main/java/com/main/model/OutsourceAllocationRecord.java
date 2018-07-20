@@ -333,9 +333,12 @@ public class OutsourceAllocationRecord extends BaseController {
     }
 
     public static void main(String [] d){
+<<<<<<< HEAD
 		String str = "345-3453-34";
 		str = str.replaceAll("-","");
 		System.out.println(str);
+=======
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
         if ("zhzhehs这是怎么_SYS".indexOf("SYS") >= 0) {
             System.out.print("有");
         }else{

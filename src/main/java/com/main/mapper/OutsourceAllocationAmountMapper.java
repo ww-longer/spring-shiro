@@ -33,10 +33,13 @@ public interface OutsourceAllocationAmountMapper extends BaseMapper<OutsourceAll
     List<String> selectAllTransfer(Map<String, Object> objectMap);
 
     List<Map<String,Object>> searchAllCompanyCaseNum();
+<<<<<<< HEAD
 
     List<Map<String,Object>> searchAllCaseAgecdNum();
 
     List<Map<String,Object>> searchAllAgecdCompanyCase();
 
     List<Map<String,Object>> searchAllAgecdCompanyAmount();
+=======
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
 }

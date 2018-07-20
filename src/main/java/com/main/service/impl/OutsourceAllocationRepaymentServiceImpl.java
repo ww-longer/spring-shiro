@@ -20,6 +20,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+<<<<<<< HEAD
+=======
+import java.lang.reflect.InvocationTargetException;
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -216,8 +220,16 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                 row = sheet.createRow(i + 1);
                 if (repayment != null) {
                     String hkStr;
+<<<<<<< HEAD
                     Boolean isColor = false;
                     if (repayment.getIsSumRefund() == 1) {
+=======
+                    if (repayment.getIsSumRefund() == 1 &&
+                            DateUtils.dateToString(date, "yyyy-MM-dd").equals(DateUtils.dateToString(repayment.getCreatDate(), "yyyy-MM-dd"))) {
+                        CellStyle cellStyle = wb.createCellStyle();
+                        cellStyle.setFillForegroundColor(IndexedColors.BRIGHT_GREEN1.getIndex());
+                        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                         hkStr = "部分";
                         if(DateUtils.dateToString(date, "yyyy-MM-dd").equals(DateUtils.dateToString(repayment.getCreatDate(), "yyyy-MM-dd"))) {
                             isColor = true;
@@ -373,7 +385,12 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                 double curAmount = 0, handOverAmount = 0;
                 int handOverAgecd = 0;
                 if (StringUtils.isNotBlank(transferStr)) transfer = DateUtils.strToDate(transferStr, "yyyyMMdd");
+<<<<<<< HEAD
                 if (StringUtils.isNotBlank(repaymentDateStr))repaymentDate = DateUtils.strToDate(repaymentDateStr, "yyyyMMdd");
+=======
+                if (StringUtils.isNotBlank(repaymentDateStr))
+                    repaymentDate = DateUtils.strToDate(repaymentDateStr, "yyyyMMdd");
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                 if (StringUtils.isNumber(curAmountStr)) curAmount = Double.parseDouble(curAmountStr);
                 if (StringUtils.isNumber(handOverAmountStr)) handOverAmount = Double.parseDouble(handOverAmountStr);
                 if (StringUtils.isNumber(handOverAgecdStr)) handOverAgecd = Integer.parseInt(handOverAgecdStr);
@@ -535,7 +552,11 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                 for (int j = 0; j < companyList.size(); j++) {
                     OutsourceCompany company = companyList.get(j);
                     // 当前公司下的所有移交还款率
+<<<<<<< HEAD
                     Map comapyMap = (Map) comapyMaps.get(company.getCompany());
+=======
+                    Map<String, Object> comapyMap = (Map<String, Object>) comapyMaps.get(company.getCompany());
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                     // 取得当前公司下的当前移交
                     RepaymentReport report = (RepaymentReport) comapyMap.get(str);
                     Double hkl = 0D, yj = null;
@@ -572,8 +593,17 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                                 break;
                         }
                     }
+<<<<<<< HEAD
                     if (StringUtils.isNumber(hklStr)) hkl = Double.parseDouble(hklStr);
                     if (StringUtils.isNumber(yjStr)) yj = Double.parseDouble(yjStr);
+=======
+                    if (StringUtils.isNumber(hklStr)) {
+                        hkl = Double.parseDouble(hklStr);
+                    }
+                    if (StringUtils.isNumber(yjStr)) {
+                        yj = Double.parseDouble(yjStr);
+                    }
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                     RankingInfo rankingInfo = new RankingInfo();
                     rankingInfo.setCompany(company.getCompany());
                     rankingInfo.setTransfer(str);
@@ -591,12 +621,22 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                 for (int j = 0; j < infoList.size(); j++) {
                     RankingInfo rankingInfo = infoList.get(j);
                     // 统计当前移交中委外公司个数
+<<<<<<< HEAD
                     if (rankingInfo.getRate() >= 0) count++;
+=======
+                    if (rankingInfo.getRate() >= 0) {
+                        count++;
+                    }
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                 }
                 for (int j = 0, p = 1; j < infoList.size(); j++) {
                     RankingInfo rankingInfo = infoList.get(j);
                     /**
+<<<<<<< HEAD
                      * 移交的公司数量小于等于 公司数/2 家时,当前有移交的公司排名全部都为第 公司数/2 + 1 + j名
+=======
+                     * 移交的公司数量小于等于 公司数/2 家时,当前有移交的公司排名全部都为第 公司数/2 + 1 名
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                      * 公司数量大于 公司数/2 时,有移交的公司排名正常计算
                      * 没有移交的公司排名为 0
                      */
@@ -611,7 +651,11 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                         } else {
                             if (count <= companyList.size() / 2) {
                                 if (j < count) {
+<<<<<<< HEAD
                                     rankingInfo.setRanking(companyList.size() / 2 + 1 + j);
+=======
+                                    rankingInfo.setRanking(companyList.size() / 2 + 1);
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                                 } else {
                                     rankingInfo.setRanking(0);
                                 }
@@ -635,7 +679,11 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                         RankingInfo rankingInfo = infoList.get(k);
                         // 当前名次, 取得当前公司的排名数据
                         if (company.getCompany().equals(rankingInfo.getCompany())) {
+<<<<<<< HEAD
                             rankMaps.put(company.getCompany() + i, rankingInfo.getRanking() > 0 ? rankingInfo.getRanking() : "");
+=======
+                            rankMaps.put(company.getCompany() + i, rankingInfo.getRanking());
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                             break;
                         }
                     }
@@ -655,6 +703,7 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
         ExcelUtils.writeFileToClient(fileName, wb, request, response);
     }
 
+<<<<<<< HEAD
     @Override
     public Map<String, List<Map<String, Object>>> loadRepaymentRateCaseNum(Map<String, Object> objectMap) {
         List<Map<String, Object>> mapList = outsourceAllocationRepaymentMapper.selectRepaymentRateCaseNum(objectMap);
@@ -1104,6 +1153,10 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
 
     /**
      * 输出委外公司排名
+=======
+    /**
+     *
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
      * @param wb
      * @param mapLists
      */
@@ -1111,7 +1164,11 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
         Sheet sheet = wb.createSheet("sheet1");
         Row row = sheet.createRow(0);
         // 写入表头
+<<<<<<< HEAD
         row.createCell(0).setCellValue("移交月份");
+=======
+        row.createCell(0).setCellValue("移交日月份");
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
         for (int i = 0, m = 1; i < companyList.size(); i++) {
             OutsourceCompany company = companyList.get(i);
             for (int j = 1; j <= 7; j++) {
@@ -1227,6 +1284,7 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                     cell.setCellValue(report.getM7hk());
                     cell = row.createCell(15);
                     cell.setCellStyle(cellStyle);
+<<<<<<< HEAD
                     cell.setCellValue(report.getM1hkl() == null ? "" : report.getM1hkl() + "%");
                     cell = row.createCell(16);
                     cell.setCellStyle(cellStyle);
@@ -1246,6 +1304,27 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                     cell = row.createCell(21);
                     cell.setCellStyle(cellStyle);
                     cell.setCellValue(report.getM7hkl() == null ? "" : report.getM7hkl() + "%");
+=======
+                    cell.setCellValue(report.getM1hkl());
+                    cell = row.createCell(16);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(report.getM2hkl());
+                    cell = row.createCell(17);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(report.getM3hkl());
+                    cell = row.createCell(18);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(report.getM4hkl());
+                    cell = row.createCell(19);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(report.getM5hkl());
+                    cell = row.createCell(20);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(report.getM6hkl());
+                    cell = row.createCell(21);
+                    cell.setCellStyle(cellStyle);
+                    cell.setCellValue(report.getM7hkl());
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                     cell = row.createCell(22);
                     cell.setCellStyle(cellStyle);
                     cell.setCellValue(report.getM1sjhk());
@@ -1292,6 +1371,7 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                     row.createCell(12).setCellValue(report.getM5hk());
                     row.createCell(13).setCellValue(report.getM6hk());
                     row.createCell(14).setCellValue(report.getM7hk());
+<<<<<<< HEAD
                     row.createCell(15).setCellValue(report.getM1hkl() == null ? "" : report.getM1hkl() + "%");
                     row.createCell(16).setCellValue(report.getM2hkl() == null ? "" : report.getM2hkl() + "%");
                     row.createCell(17).setCellValue(report.getM3hkl() == null ? "" : report.getM3hkl() + "%");
@@ -1299,6 +1379,15 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                     row.createCell(19).setCellValue(report.getM5hkl() == null ? "" : report.getM5hkl() + "%");
                     row.createCell(20).setCellValue(report.getM6hkl() == null ? "" : report.getM6hkl() + "%");
                     row.createCell(21).setCellValue(report.getM7hkl() == null ? "" : report.getM7hkl() + "%");
+=======
+                    row.createCell(15).setCellValue(report.getM1hkl());
+                    row.createCell(16).setCellValue(report.getM2hkl());
+                    row.createCell(17).setCellValue(report.getM3hkl());
+                    row.createCell(18).setCellValue(report.getM4hkl());
+                    row.createCell(19).setCellValue(report.getM5hkl());
+                    row.createCell(20).setCellValue(report.getM6hkl());
+                    row.createCell(21).setCellValue(report.getM7hkl());
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                     row.createCell(22).setCellValue(report.getM1sjhk());
                     row.createCell(23).setCellValue(report.getM2sjhk());
                     row.createCell(24).setCellValue(report.getM3sjhk());
@@ -1330,8 +1419,17 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
             String amountOverrideStr = map.get("amountOverride").toString();
             int ageCd = 0;
             double amountOverride = 0;
+<<<<<<< HEAD
             if (StringUtils.isNumber(ageCdStr)) ageCd = Integer.parseInt(ageCdStr);
             if (StringUtils.isNumber(amountOverrideStr)) amountOverride = Double.parseDouble(amountOverrideStr);
+=======
+            if (StringUtils.isNumber(ageCdStr)) {
+                ageCd = Integer.parseInt(ageCdStr);
+            }
+            if (StringUtils.isNumber(amountOverrideStr)) {
+                amountOverride = Double.parseDouble(amountOverrideStr);
+            }
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
             if (StringUtils.isNotBlank(turnOverDayStr)) {
                 maps = allMaps.get(turnOverDayStr);
                 if (maps == null) {
@@ -1339,6 +1437,7 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                     maps.put("transfer", turnOverDayStr);
                 }
                 // 移交统计计算
+<<<<<<< HEAD
                 if (ageCd >= 7) {
                     String amountStr = maps.get("m7yj") == null ? "" : maps.get("m7yj").toString();
                     double amount = 0;
@@ -1350,6 +1449,18 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                             maps.put("m" + (j + 1) + "yj", amountOverride);
                             break;
                         }
+=======
+                for (int j = 0; j < 7; j++) {
+                    if (ageCd == j + 1) maps.put("m" + (j + 1) + "yj", amountOverride);
+                    if (ageCd > 7) {
+                        String amountStr = maps.get("m7yj") == null ? "" : maps.get("m7yj").toString();
+                        double amount = 0;
+                        if (StringUtils.isNumber(amountStr)) {
+                            amount = Double.parseDouble(amountStr);
+                        }
+                        maps.put("m7yj", amountOverride + amount);
+                        break;
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                     }
                 }
             }
@@ -1364,15 +1475,28 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
             String curAmountStr = map.get("curAmount").toString();
             int handOverAgeCd = 0;
             double handOverAmount = 0, curAmount = 0;
+<<<<<<< HEAD
             if (StringUtils.isNumber(handOverAgeCdStr)) handOverAgeCd = Integer.parseInt(handOverAgeCdStr);
             if (StringUtils.isNumber(handOverAmountStr)) handOverAmount = Double.parseDouble(handOverAmountStr);
             if (StringUtils.isNumber(curAmountStr)) curAmount = Double.parseDouble(curAmountStr);
+=======
+            if (StringUtils.isNumber(handOverAgeCdStr)) {
+                handOverAgeCd = Integer.parseInt(handOverAgeCdStr);
+            }
+            if (StringUtils.isNumber(handOverAmountStr)) {
+                handOverAmount = Double.parseDouble(handOverAmountStr);
+            }
+            if (StringUtils.isNumber(curAmountStr)) {
+                curAmount = Double.parseDouble(curAmountStr);
+            }
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
             if (StringUtils.isNotBlank(transfer)) {
                 maps = allMaps.get(transfer);
                 if (maps == null) {
                     maps = new HashMap<>();
                     maps.put("transfer", transfer);
                 }
+<<<<<<< HEAD
                 // 实际还款移交金额 + 实际还款金额
                 if (handOverAgeCd > 7) {
                     String m7hkStr = maps.get("m7hk") == null ? "" : maps.get("m7hk").toString();
@@ -1389,6 +1513,32 @@ public class OutsourceAllocationRepaymentServiceImpl extends ServiceImpl<Outsour
                             maps.put("m" + (j + 1) + "sjhk", curAmount);
                             break;
                         }
+=======
+                // 实际还款移交金额
+                for (int j = 0; j < 7; j++) {
+                    if (handOverAgeCd == j + 1) maps.put("m" + (j + 1) + "hk", handOverAmount);
+                    if (handOverAgeCd > 7) {
+                        String amountStr = maps.get("m7hk") == null ? "" : maps.get("m7hk").toString();
+                        double amount = 0;
+                        if (StringUtils.isNumber(amountStr)) {
+                            amount = Double.parseDouble(amountStr);
+                        }
+                        maps.put("m7hk", handOverAmount + amount);
+                        break;
+                    }
+                }
+                // 实际还款金额
+                for (int j = 0; j < 7; j++) {
+                    if (handOverAgeCd == j + 1) maps.put("m" + (j + 1) + "sjhk", curAmount);
+                    if (handOverAgeCd > 7) {
+                        String amountStr = maps.get("m7sjhk") == null ? "" : maps.get("m7sjhk").toString();
+                        double amount = 0;
+                        if (StringUtils.isNumber(amountStr)) {
+                            amount = Double.parseDouble(amountStr);
+                        }
+                        maps.put("m7sjhk", curAmount + amount);
+                        break;
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
                     }
                 }
             }

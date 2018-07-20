@@ -1,13 +1,19 @@
 package com.main.controller;
 
 import com.main.model.OutsourceAllocationRepayment;
+<<<<<<< HEAD
 import com.main.model.TurnOverRepayment;
+=======
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
 import com.main.service.IOutsourceAllocationAmountService;
 import com.main.service.OutsourceAllocationRepaymentService;
 import com.main.service.OutsourceCompanyService;
 import com.sys.commons.base.BaseController;
 import com.sys.commons.result.PageInfo;
+<<<<<<< HEAD
 import com.sys.commons.utils.DateUtils;
+=======
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
 import com.sys.commons.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+<<<<<<< HEAD
 import java.util.*;
 
 /**
@@ -30,6 +37,13 @@ import java.util.*;
  *
  * @author jiewai
  * @since 2018-07-04
+=======
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by jiewai on 2018/7/4.
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
  */
 @Controller
 @RequestMapping("/sc/collection/statistic")
@@ -104,6 +118,7 @@ public class StatisticsStatementController  extends BaseController {
      */
     @GetMapping("/showStatisticPage")
     public String showStatisticPage(Model model) {
+<<<<<<< HEAD
         Date date = new Date();
         List<String> dateList = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
@@ -120,11 +135,14 @@ public class StatisticsStatementController  extends BaseController {
         }
         model.addAttribute("dateList", dateList);
         model.addAttribute("agecdMap", map);
+=======
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
         model.addAttribute("companies", outsourceCompanyService.loadAllCompany());
         return "sc_main/statement/statisticalInfo";
     }
 
     /**
+<<<<<<< HEAD
      * 查询统计公司下所有账龄的案件总数
      * @return
      */
@@ -219,4 +237,17 @@ public class StatisticsStatementController  extends BaseController {
         outsourceAllocationRepaymentService.downloadTurnOverRepaymentRate(objectMap, request, response);
     }
 
+=======
+     * 查询统计数据
+     * @return
+     */
+    @PostMapping("/loadAllOutCompanyCaseNum")
+    @ResponseBody
+    public Object loadAllOutCompanyCaseNum() {
+        Map<String, Object> objectMap = new HashMap<>();
+        objectMap.put("caseNum", allocationAmountService.loadAllOutCompanyCaseNum());
+        return renderSuccess(objectMap);
+    }
+
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
 }

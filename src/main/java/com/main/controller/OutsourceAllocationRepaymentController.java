@@ -10,6 +10,7 @@ import com.sys.commons.base.BaseController;
 import com.sys.commons.result.PageInfo;
 import com.sys.commons.utils.ExcelUtils;
 import com.sys.commons.utils.FileUtils;
+import com.sys.commons.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

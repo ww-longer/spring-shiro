@@ -28,13 +28,18 @@ public interface OutsourceAllocationRepaymentService extends IService<OutsourceA
 
     OutsourceAllocationRepayment loadRepaymentById(Integer id);
 
+<<<<<<< HEAD
     void importRepaymentHisExcel(List<Map<String, Object>> listMap);
+=======
+    void importRepaymentHisExcel(List<HashMap<String, Object>> listMap);
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
 
     void selectRepaymentRatePageInfo(PageInfo pageInfo);
 
     void exportInRepaymentReportByMap(Map<String, Object> objectMap, HttpServletRequest request, HttpServletResponse response);
 
     void exportCompanyRankingExp(HttpServletRequest request, HttpServletResponse response);
+<<<<<<< HEAD
 
     Map<String, List<Map<String, Object>>> loadRepaymentRateCaseNum(Map<String, Object> objectMap);
 
@@ -43,4 +48,6 @@ public interface OutsourceAllocationRepaymentService extends IService<OutsourceA
     Map<String, List<TurnOverRepayment>> loadTurnOverRepaymentRateNum(Map<String, Object> objectMap);
 
     void downloadTurnOverRepaymentRate(Map<String, Object> objectMap, HttpServletRequest request, HttpServletResponse response);
+=======
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
 }

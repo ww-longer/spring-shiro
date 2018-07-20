@@ -161,6 +161,7 @@
         <include refid="Base_Column_List"/>
         FROM OUTSOURCE_ALLOCATION_AMOUNT WHERE ID = #{id}
     </select>
+<<<<<<< HEAD
 
     <!-- 查询当前所有再催移交日期 -->
     <select id="selectAllTransfer" resultType="java.lang.String">
@@ -175,6 +176,22 @@
         GROUP BY r.TRANSFER
     </select>
 
+=======
+
+    <!-- 查询当前所有再催移交日期 -->
+    <select id="selectAllTransfer" resultType="java.lang.String">
+        SELECT DATE_FORMAT(r.TRANSFER, '%Y%m%d') AS transfer FROM
+        OUTSOURCE_ALLOCATION_AMOUNT r
+        <where>
+            1=1
+            <if test="company != null and company != ''">
+                AND COMPANY = #{company}
+            </if>
+        </where>
+        GROUP BY r.TRANSFER
+    </select>
+
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
     <!-- 插入数据并返回ID -->
     <insert id="insertInfo" parameterType="com.main.model.OutsourceAllocationAmount" useGeneratedKeys="true"
             keyProperty="id">
@@ -228,6 +245,10 @@
     <select id="searchAllAgecdCompanyAmount" resultType="Map">
         SELECT COMPANY AS company, NOW_AGECD as agecd, COUNT(1) count, SUM(now_collection_amount) as sum FROM `OUTSOURCE_ALLOCATION_AMOUNT`
         WHERE 1=1 AND NOW_AGECD &lt;&gt; 0 GROUP BY NOW_AGECD, COMPANY
+    </select>
+
+    <select id="searchAllCompanyCaseNum" resultType="Map">
+        SELECT company, COUNT(1) count FROM `outsource_allocation_amount` GROUP BY company
     </select>
 
 </mapper>

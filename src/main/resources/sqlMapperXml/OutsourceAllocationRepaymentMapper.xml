@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.main.mapper.OutsourceAllocationRepaymentMapper">
 
+<<<<<<< HEAD
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.main.model.OutsourceAllocationRepayment">
         <id column="id" property="id"/>
@@ -23,6 +24,29 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
+=======
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.main.model.OutsourceAllocationRepayment">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="cust_id" property="custId" />
+		<result column="tel_number" property="telNumber" />
+		<result column="ious" property="ious" />
+		<result column="cur_amount" property="curAmount" />
+		<result column="repayment_date" property="repaymentDate" />
+		<result column="transfer" property="transfer" />
+		<result column="hand_over_agecd" property="handOverAgecd" />
+		<result column="hand_over_amount" property="handOverAmount" />
+		<result column="company" property="company" />
+		<result column="creat_date" property="creatDate" />
+		<result column="product_name" property="productName" />
+		<result column="is_sum_refund" property="isSumRefund" />
+		<result column="remarks" property="remarks" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
 		id, name, cust_id AS custId, tel_number AS telNumber, ious, cur_amount AS curAmount,
 		repayment_date AS repaymentDate, transfer, hand_over_agecd AS handOverAgecd,
 		hand_over_amount AS handOverAmount, company,creat_date AS creatDate, product_name AS productName,
@@ -206,5 +230,43 @@
         GROUP BY p.`month`, p.daysum,  p.hand_over_agecd
         ORDER BY p.`month`, p.daysum ASC
     </select>
+
+	<!-- 还款报表_还款 -->
+	<select id="selectRepaymentRateInfo" resultType="Map">
+		SELECT
+		z.transfer AS transfer, z.hand_over_agecd AS handOverAgeCd, ROUND(SUM(z.hand_over_amount), 2) AS handOverAmount,
+		ROUND(SUM(z.cur_amount), 2) AS curAmount
+		FROM (
+			SELECT
+			r.ious, r.transfer, r.hand_over_agecd, r.hand_over_amount, r.cur_amount
+			FROM (
+				SELECT
+				ious, DATE_FORMAT(transfer, '%Y%m%d') AS transfer, hand_over_agecd,
+				IF ( hand_over_amount > cur_amount, cur_amount, hand_over_amount) hand_over_amount,
+				cur_amount AS cur_amount
+				FROM
+				outsource_allocation_repayment
+				<where>
+					1=1
+					<if test="company != null and company != ''">
+						AND COMPANY = #{company}
+					</if>
+				</where>
+				) r
+			) z
+		GROUP BY z.transfer, z.hand_over_agecd;
+	</select>
+	<!-- 还款报表_大总 -->
+	<select id="selectRecordStatementInfo" resultType="Map">
+		SELECT turn_over_day AS turnOverDay,age_cd AS ageCd, Round(SUM(amount_override),2) AS amountOverride
+		FROM outsource_allocation_record
+		<where>
+			1=1
+			<if test="company != null and company != ''">
+				AND DCA_DISTRIBUTION = #{company}
+			</if>
+		</where>
+		GROUP BY turn_over_day, age_cd
+	</select>
 
 </mapper>

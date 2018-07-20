@@ -34,6 +34,7 @@ public interface IOutsourceAllocationAmountService extends IService<OutsourceAll
 
     void updateAmountHisByCustId(OutsourceAllocationAmountHis amountHis);
 
+<<<<<<< HEAD
     void exportInAllLeaveByMap(Map<String, Object> amountMap, HttpServletRequest request, HttpServletResponse response);
 
     List<Map<String, Object>> loadAllOutCompanyCaseNum();
@@ -43,4 +44,9 @@ public interface IOutsourceAllocationAmountService extends IService<OutsourceAll
     List<Map<String, Object>> loadAllOutAgecdCaseCount();
 
     List<Map<String, Object>> loadAllOutAgecdCaseAAmount();
+=======
+    List<Map<String, Object>> loadAllOutCompanyCaseNum();
+
+    void exportInAllLeaveByMap(Map<String, Object> amountMap, HttpServletRequest request, HttpServletResponse response);
+>>>>>>> 820b10959a43b0fbc60804f4f0f01cc98886e790
 }
